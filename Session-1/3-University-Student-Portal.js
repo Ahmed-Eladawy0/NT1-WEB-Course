@@ -1,31 +1,31 @@
-// E-Commerce Checkout System
-let productPrice = 500;
-let quantity = 2;
-let category = "electronics";
-let coupon = "SAVE10";
-let paymentMethod = "credit";
+// University Student Portal
+let studentName = "Adawy";
+let attendance = 85;
+let midterm = 20;
+let finalExam = 40;
+let assignment = 15;
+let tuitionPaid = true;
 
-let subtotal = productPrice * quantity;
-let discount = 0;
+if (!tuitionPaid) {
+    console.log("Access Denied: Tuition not paid.");
+} else {
+    if (attendance < 75) {
+        console.log("Status: Fail (Attendance too low)");
+    } else {
+        let totalScore = midterm + finalExam + assignment;
+        let grade = "";
 
-if (category === "electronics") {
-    discount = subtotal * 0.1;
+        if (totalScore >= 90) grade = "A";
+        else if (totalScore >= 75) grade = "B";
+        else if (totalScore >= 50) grade = "Pass";
+        else grade = "Fail";
+
+        console.log("Name: " + studentName);
+        console.log("Total Score: " + totalScore);
+        console.log("Grade: " + grade);
+
+        if (totalScore >= 95) {
+            console.log("Scholarship Eligible!");
+        }
+    }
 }
-
-if (coupon === "SAVE10") {
-    discount = discount + 50;
-}
-
-if (paymentMethod === "credit") {
-    discount = discount + 20;
-}
-
-let vat = (subtotal - discount) * 0.14;
-let finalPrice = (subtotal - discount) + vat;
-
-if (finalPrice < 0) {
-    finalPrice = 0;
-}
-
-console.log("Subtotal: " + subtotal);
-console.log("Final Total: " + finalPrice);
