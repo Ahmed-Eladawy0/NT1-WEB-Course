@@ -129,6 +129,7 @@ principal.addMember(student2);
 student1.enrollSubject("Cyber Security");
 student1.enrollSubject("Web Development");
 student2.enrollSubject("Cyber Security");
+student2.enrollSubject("Web Development");
 
 teacher1.gradeStudent(student1, "A+");
 teacher1.gradeStudent(student2, "B");
