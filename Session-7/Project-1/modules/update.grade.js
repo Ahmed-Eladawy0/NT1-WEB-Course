@@ -9,7 +9,6 @@ async function updateGrade(identifier, newGrade) {
 
   try {
     const grades = await readGrades();
-    // Supports updating by ID or Name
     const record = grades.find(
       item => item.id === Number(identifier) || item.name.toLowerCase() === String(identifier).toLowerCase()
     );
