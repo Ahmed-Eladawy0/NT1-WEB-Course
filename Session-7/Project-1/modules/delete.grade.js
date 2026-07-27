@@ -1,6 +1,5 @@
 const readGrades = require("./read.grades");
 const saveGrades = require("./save.grades");
-
 async function deleteGrade(identifier) {
   try {
     const grades = await readGrades();
