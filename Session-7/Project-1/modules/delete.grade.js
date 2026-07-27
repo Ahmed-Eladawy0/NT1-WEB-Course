@@ -1,9 +1,9 @@
 const readGrades = require("./read.grades");
 const saveGrades = require("./save.grades");
+
 async function deleteGrade(identifier) {
   try {
     const grades = await readGrades();
-    // Supports deleting by ID or Name
     const index = grades.findIndex(
       item => item.id === Number(identifier) || item.name.toLowerCase() === String(identifier).toLowerCase()
     );
@@ -21,4 +21,4 @@ async function deleteGrade(identifier) {
   }
 }
 
-module.exports = deleteGrade;س
+module.exports = deleteGrade;
