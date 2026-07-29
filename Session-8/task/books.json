@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "A Game of Thrones",
+    "author": "George R. R. Martin",
+    "price": 850,
+    "available": true
+  },
+  {
+    "id": 2,
+    "title": "Batman: The Killing Joke",
+    "author": "Alan Moore",
+    "price": 450,
+    "available": true
+  },
+  {
+    "id": 3,
+    "title": "The Lord of the Rings",
+    "author": "J.R.R. Tolkien",
+    "price": 950,
+    "available": false
+  },
+  {
+    "id": 4,
+    "title": "Spider-Man: Homecoming",
+    "author": "Marvel Comics",
+    "price": 420,
+    "available": true
+  },
+  {
+    "id": 5,
+    "title": "Harry Potter and the Sorcerer's Stone",
+    "author": "J.K. Rowling",
+    "price": 600,
+    "available": true
+  },
+  {
+    "id": 6,
+    "title": "Dune",
+    "author": "Frank Herbert",
+    "price": 750,
+    "available": true
+  }
+]
