@@ -1,8 +1,5 @@
 const express = require("express");
 const app = express();
-const fs = require("fs");
-let courses = JSON.parse(fs.readFileSync("./data/courses-data.json", "utf-8"));
-
 app.use(express.json());
 app.get("/api/v1/courses", (req, res) => {
   res.status(200).json({
