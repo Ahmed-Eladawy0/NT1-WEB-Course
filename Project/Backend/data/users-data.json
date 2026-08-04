@@ -1,0 +1,40 @@
+[
+  {
+    "id": 1,
+    "name": "Admin Adawy",
+    "email": "admin@platform.com",
+    "password": "123",
+    "role": "admin"
+  },
+  {
+    "id": 2,
+    "name": "Ahmed Eladawy",
+    "email": "adawy@gmail.com",
+    "password": "1692004",
+    "role": "admin"
+  },
+  {
+    "id": 3,
+    "name": "Sama Eladawy",
+    "email": "sama@yahoo.com",
+    "password": "24082007",
+    "role": "user",
+    "enrolledCourses": [
+      "MongoDB & Mongoose"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Mohamed Omar",
+    "email": "mohamed@gmail.com",
+    "password": "Omar1234",
+    "role": "user"
+  },
+  {
+    "id": 5,
+    "name": "User",
+    "email": "user@platform.com",
+    "password": "123",
+    "role": "user"
+  }
+]
