@@ -1,0 +1,86 @@
+[
+  {
+    "title": "Node.js Fundamentals",
+    "instructor": "Esraa Said",
+    "category": "Backend",
+    "description": "Learn the fundamentals of Node.js including modules, file system, events, and building scalable server-side applications.",
+    "price": 199,
+    "duration": "10 hours",
+    "level": "Beginner",
+    "rating": 4.8,
+    "students": 1200,
+    "imageUrl": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3"
+  },
+  {
+    "title": "Express.js REST API Bootcamp",
+    "instructor": "Ahmed Hassan",
+    "category": "Backend",
+    "description": "Build RESTful APIs using Express.js, middleware, routing, error handling, and MVC architecture.",
+    "price": 149,
+    "duration": "8 hours",
+    "level": "Intermediate",
+    "rating": 4.7,
+    "students": 850,
+    "imageUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c"
+  },
+  {
+    "title": "MongoDB & Mongoose Masterclass",
+    "instructor": "Sara Mohamed",
+    "category": "Database",
+    "description": "Understand MongoDB collections, documents, aggregation, and Mongoose schemas, models, and validation.",
+    "price": 179,
+    "duration": "7 hours",
+    "level": "Intermediate",
+    "rating": 4.9,
+    "students": 640,
+    "imageUrl": "https://images.unsplash.com/photo-1544383835-bda2bc66a55d"
+  },
+  {
+    "title": "Angular Complete Guide",
+    "instructor": "Mohamed Omar",
+    "category": "Frontend",
+    "description": "Build modern Angular applications using components, routing, services, RxJS, and Signals.",
+    "price": 249,
+    "duration": "15 hours",
+    "level": "Advanced",
+    "rating": 4.9,
+    "students": 2100,
+    "imageUrl": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4"
+  },
+  {
+    "title": "JavaScript Essentials",
+    "instructor": "Nour Ahmed",
+    "category": "Programming",
+    "description": "Master JavaScript from variables and functions to objects, prototypes, asynchronous programming, and ES6+ features.",
+    "price": 99,
+    "duration": "6 hours",
+    "level": "Beginner",
+    "rating": 4.6,
+    "students": 3100,
+    "imageUrl": "https://images.unsplash.com/photo-1498050108023-c5249f4df085"
+  },
+  {
+    "title": "Docker & DevOps Basics",
+    "instructor": "Mahmoud Ali",
+    "category": "DevOps",
+    "description": "Learn Docker containers, images, volumes, networking, and deployment fundamentals for modern applications.",
+    "price": 189,
+    "duration": "9 hours",
+    "level": "Intermediate",
+    "rating": 4.5,
+    "students": 980,
+    "imageUrl": "https://images.unsplash.com/photo-1605745341112-85968b19335b"
+  },
+  {
+    "title": "Flutter Mobile Development",
+    "instructor": "Mona Khaled",
+    "category": "Mobile",
+    "description": "Create cross-platform mobile applications using Flutter, Dart, widgets, state management, and Firebase integration.",
+    "price": 229,
+    "duration": "14 hours",
+    "level": "Advanced",
+    "rating": 4.8,
+    "students": 760,
+    "imageUrl": "https://images.unsplash.com/photo-1522542550221-31fd19575a2d"
+  }
+]
