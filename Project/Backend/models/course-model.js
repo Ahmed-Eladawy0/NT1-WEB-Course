@@ -33,6 +33,10 @@ const courseSchema = new mongoose.Schema(
       required: [true, "Course duration is required"],
       trim: true,
     },
+    imageUrl: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true,

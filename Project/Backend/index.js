@@ -9,6 +9,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 dbConnect();
+const path = require("path");
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/v1/courses", courseRouter);
 app.use("/api/v1/auth", authRouter);
 const PORT = process.env.PORT || 5000;
