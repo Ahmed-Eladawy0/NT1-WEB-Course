@@ -1,178 +1,235 @@
-const fs = require("fs");
-const path = require("path");
-
-let users = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "../data/users-data.json"), "utf-8")
-);
+const User = require("../models/user-model");
+const generateToken = require("../utils/get-jwt");
+const bcrypt = require("bcryptjs");
+const deleteUploadedFile = require("../utils/delete-uploaded-file");
 
 // (Login)
-const loginUser = (req, res) => {
-  const { email, password } = req.body;
-  const user = users.find(u => u.email === email && u.password === password);
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-  if (!user) {
-    return res.status(401).json({
-      status: "fail",
-      message: "Invalid email or password",
+    if (!email || !password) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Email and Password are required.",
+      });
+    }
+
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user) {
+      return res.status(401).json({
+        status: "fail",
+        message: "Invalid email or password",
+      });
+    }
+
+    const comparePasswords = await bcrypt.compare(password, user.password);
+    if (!comparePasswords) {
+      return res.status(401).json({
+        status: "fail",
+        message: "Invalid email or password",
+      });
+    }
+
+    user.password = undefined; // مسح الباسورد من النتيجة المعروضة
+    const token = generateToken(user);
+
+    res.status(200).json({
+      status: "success",
+      message: "Logged in successfully",
+      token,
+      data: {
+        user,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
     });
   }
-
-  res.status(200).json({
-    status: "success",
-    message: "Logged in successfully",
-    data: {
-      user // بنرجع الكائن كامل بكل بياناته (phone, avatar, enrolledCourses) من غير نقص
-    }
-  });
 };
 
 // Signup
-const signupUser = (req, res) => {
-  const { name, email, password } = req.body;
-  
-  const existingUser = users.find(u => u.email === email);
-  if (existingUser) {
-    return res.status(400).json({
-      status: "fail",
-      message: "Email already exists",
+const signupUser = async (req, res) => {
+  try {
+    const user = await User.create({
+      ...req.body,
+      role: "student",
+      imageUrl: req.file ? req.file.filename : "default-user.webp",
     });
-  }
 
-  const newUser = {
-    id: users.length > 0 ? users[users.length - 1].id + 1 : 1,
-    name,
-    email,
-    password,
-    role: "user",
-    phone: "",
-    avatar: "",
-    enrolledCourses: []
-  };
+    const token = generateToken(user);
 
-  users.push(newUser);
-
-  fs.writeFile(
-    path.join(__dirname, "../data/users-data.json"),
-    JSON.stringify(users, null, 2),
-    () => {
-      res.status(201).json({
-        status: "success",
-        message: "Account created successfully",
-        data: {
-          user: newUser
-        }
+    res.status(201).json({
+      status: "success",
+      message: "Account created successfully",
+      token,
+      data: {
+        user,
+      },
+    });
+  } catch (error) {
+    if (req.file) {
+      deleteUploadedFile("users", req.file.filename);
+    }
+    // معالجة خطأ تكرار الإيميل من MongoDB
+    if (error.code === 11000) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Email already exists",
       });
     }
-  );
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
 };
+
 // Get all users (for admin purposes)
-const getAllUsers = (req, res) => {
-  res.status(200).json({
-    status: "success",
-    count: users.length,
-    data: { users }
-  });
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json({
+      status: "success",
+      count: users.length,
+      data: { users },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
 };
 
 // Change user role (admin only)
-const updateUserRole = (req, res) => {
-  const userId = Number(req.params.id);
-  const user = users.find(u => u.id === userId);
+const updateUserRole = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
 
-  if (!user) {
-    return res.status(404).json({ status: "fail", message: "User not found" });
-  }
-
-  user.role = user.role === "admin" ? "user" : "admin";
-
-  fs.writeFile(
-    path.join(__dirname, "../data/users-data.json"),
-    JSON.stringify(users, null, 2),
-    () => {
-      res.status(200).json({
-        status: "success",
-        message: "User role updated successfully",
-        data: { user }
-      });
+    if (!user) {
+      return res.status(404).json({ status: "fail", message: "User not found" });
     }
-  );
-};
-//Delete user (admin only)
-const deleteUser = (req, res) => {
-  const userId = Number(req.params.id);
-  const userIndex = users.findIndex(u => u.id === userId);
 
-  if (userIndex === -1) {
-    return res.status(404).json({ status: "fail", message: "User not found" });
+    user.role = user.role === "admin" ? "student" : "admin";
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "User role updated successfully",
+      data: { user: updatedUser },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
   }
-
-  users.splice(userIndex, 1);
-
-  fs.writeFile(
-    path.join(__dirname, "../data/users-data.json"),
-    JSON.stringify(users, null, 2),
-    () => {
-      res.status(200).json({
-        status: "success",
-        message: "User deleted successfully"
-      });
-    }
-  );
 };
-// edit profile (user only)
-const updateProfile = (req, res) => {
-  const userId = Number(req.params.id);
-  const { name, phone, avatar } = req.body;
-  
-  const user = users.find(u => u.id === userId);
-  if (!user) {
-    return res.status(404).json({ status: "fail", message: "User not found" });
+
+// Delete user (admin only)
+const deleteUser = async (req, res) => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+
+    if (!deletedUser) {
+      return res.status(404).json({ status: "fail", message: "User not found" });
+    }
+
+    // حذف صورة اليوزر لو عنده صورة غير الافتراضية
+    if (deletedUser.imageUrl && deletedUser.imageUrl !== "default-user.webp") {
+      deleteUploadedFile("users", deletedUser.imageUrl);
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
   }
-  if (name) user.name = name;
-  if (phone) user.phone = phone;
-  if (avatar) user.avatar = avatar;
-
-  fs.writeFile(
-    path.join(__dirname, "../data/users-data.json"),
-    JSON.stringify(users, null, 2),
-    () => {
-      res.status(200).json({
-        status: "success",
-        message: "Profile updated successfully",
-        data: { user }
-      });
-    }
-  );
 };
+
+// Edit profile (user only)
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ status: "fail", message: "User not found" });
+    }
+
+    if (req.body.firstName) user.firstName = req.body.firstName;
+    if (req.body.lastName) user.lastName = req.body.lastName;
+    if (req.body.phone) user.phone = req.body.phone;
+
+    if (req.file) {
+      if (user.imageUrl && user.imageUrl !== "default-user.webp") {
+        deleteUploadedFile("users", user.imageUrl);
+      }
+      user.imageUrl = req.file.filename;
+    }
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Profile updated successfully",
+      data: { user: updatedUser },
+    });
+  } catch (error) {
+    if (req.file) {
+      deleteUploadedFile("users", req.file.filename);
+    }
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
 // Enroll Course
-const enrollCourse = (req, res) => {
-  const userId = Number(req.params.id);
-  const { courseTitle } = req.body;
+const enrollCourse = async (req, res) => {
+  try {
+    // استخدمنا courseId بدل courseTitle عشان الـ Relations في الداتابيز
+    const { courseId } = req.body; 
 
-  const user = users.find(u => u.id === userId);
-  if (!user) {
-    return res.status(404).json({ status: "fail", message: "User not found" });
-  }
+    const user = await User.findById(req.params.id);
 
-  if (!user.enrolledCourses) {
-    user.enrolledCourses = [];
-  }
-
-  if (!user.enrolledCourses.includes(courseTitle)) {
-    user.enrolledCourses.push(courseTitle);
-  }
-
-  fs.writeFile(
-    path.join(__dirname, "../data/users-data.json"),
-    JSON.stringify(users, null, 2),
-    () => {
-      res.status(200).json({
-        status: "success",
-        message: "Enrolled successfully",
-        data: { user }
-      });
+    if (!user) {
+      return res.status(404).json({ status: "fail", message: "User not found" });
     }
-  );
+
+    if (!user.myCourses.includes(courseId)) {
+      user.myCourses.push(courseId);
+      await user.save();
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Enrolled successfully",
+      data: { user },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
 };
 
-module.exports = { loginUser, signupUser, getAllUsers, updateUserRole , deleteUser, updateProfile, enrollCourse };
+module.exports = {
+  loginUser,
+  signupUser,
+  getAllUsers,
+  updateUserRole,
+  deleteUser,
+  updateProfile,
+  enrollCourse,
+};
