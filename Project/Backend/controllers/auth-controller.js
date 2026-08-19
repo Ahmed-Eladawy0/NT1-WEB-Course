@@ -32,7 +32,7 @@ const loginUser = async (req, res) => {
       });
     }
 
-    user.password = undefined; // مسح الباسورد من النتيجة المعروضة
+    user.password = undefined;
     const token = generateToken(user);
 
     res.status(200).json({
@@ -74,7 +74,6 @@ const signupUser = async (req, res) => {
     if (req.file) {
       deleteUploadedFile("users", req.file.filename);
     }
-    // معالجة خطأ تكرار الإيميل من MongoDB
     if (error.code === 11000) {
       return res.status(400).json({
         status: "fail",
@@ -138,8 +137,6 @@ const deleteUser = async (req, res) => {
     if (!deletedUser) {
       return res.status(404).json({ status: "fail", message: "User not found" });
     }
-
-    // حذف صورة اليوزر لو عنده صورة غير الافتراضية
     if (deletedUser.imageUrl && deletedUser.imageUrl !== "default-user.webp") {
       deleteUploadedFile("users", deletedUser.imageUrl);
     }
@@ -156,10 +153,26 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// Edit profile (user only)
+// Get User Profile (Protected)
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).populate("myCourses");
+    if (!user) {
+      return res.status(404).json({ status: "fail", message: "User not found" });
+    }
+    res.status(200).json({ status: "success", data: { user } });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+// Edit profile (Protected)
 const updateProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.userId);
 
     if (!user) {
       return res.status(404).json({ status: "fail", message: "User not found" });
@@ -194,13 +207,11 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// Enroll Course
+// Enroll Course (Protected)
 const enrollCourse = async (req, res) => {
   try {
-    // استخدمنا courseId بدل courseTitle عشان الـ Relations في الداتابيز
     const { courseId } = req.body; 
-
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.userId);
 
     if (!user) {
       return res.status(404).json({ status: "fail", message: "User not found" });
@@ -232,4 +243,5 @@ module.exports = {
   deleteUser,
   updateProfile,
   enrollCourse,
+  getUserProfile
 };
