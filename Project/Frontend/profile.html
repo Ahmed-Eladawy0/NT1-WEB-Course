@@ -6,28 +6,30 @@
 <title>SkillHub — My Profile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <style>
-  .profile-wrap{ max-width:520px; margin:40px auto 60px; }
-  .avatar-zone{
-    display:flex; flex-direction:column; align-items:center; gap:12px;
-    padding:28px 24px 22px; border-bottom:1px solid var(--border);
-  }
-  .avatar-big{
-    width:96px; height:96px; border-radius:50%; object-fit:cover;
-    border:3px solid var(--surface); box-shadow:0 0 0 3px var(--brand-soft);
-    background:linear-gradient(135deg, var(--brand), #8B7CF6);
-    display:flex; align-items:center; justify-content:center;
-    color:#fff; font-size:32px; font-weight:700; overflow:hidden;
-  }
+  .profile-layout{ max-width:880px; margin:40px auto 60px; display:grid; grid-template-columns:1fr 1.15fr; gap:24px; align-items:start; }
+  @media (max-width:820px){ .profile-layout{ grid-template-columns:1fr; } }
+
+  .avatar-zone{ display:flex; flex-direction:column; align-items:center; gap:12px; padding:28px 24px 22px; border-bottom:1px solid var(--border); }
+  .avatar-big{ width:96px; height:96px; border-radius:50%; object-fit:cover; box-shadow:0 0 0 3px var(--brand-soft); background:linear-gradient(135deg, var(--brand), #3E6B4D); display:flex; align-items:center; justify-content:center; color:#fff; font-size:32px; font-weight:700; overflow:hidden; }
   .avatar-big img{ width:100%; height:100%; object-fit:cover; }
-  .avatar-actions{ display:flex; gap:8px; align-items:center; }
   .avatar-actions input[type=file]{ display:none; }
   .form-body{ padding:24px; }
-  .readonly-hint{ font-size:12px; color:var(--ink-soft); margin-top:4px; }
   .save-bar{ display:flex; gap:10px; margin-top:6px; }
   .save-bar .btn{ flex:1; }
+
+  .mycourses-card{ padding:0; overflow:hidden; }
+  .mycourses-head{ padding:20px 22px 16px; border-bottom:1px solid var(--border); }
+  .mycourses-head h3{ font-size:16.5px; }
+  .mycourses-list{ display:flex; flex-direction:column; }
+  .mycourse-row{ display:flex; align-items:center; gap:12px; padding:14px 22px; border-bottom:1px solid var(--border); }
+  .mycourse-row:last-child{ border-bottom:none; }
+  .mycourse-cover{ width:44px; height:44px; border-radius:8px; flex-shrink:0; background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; }
+  .mycourse-cover svg{ width:18px; height:18px; opacity:.55; }
+  .mycourse-title{ font-size:14px; font-weight:600; }
+  .mycourse-meta{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
 </style>
 </head>
 <body>
@@ -35,9 +37,7 @@
 <div class="page">
   <div class="topbar">
     <div class="topbar-inner">
-      <a class="brand" href="user-dashboard.html">
-        <span class="brand-mark">◆</span> SkillHub <span class="brand-sub">learner</span>
-      </a>
+      <a class="brand" href="user-dashboard.html"><span class="brand-mark">S</span> SkillHub <span class="brand-sub">learner</span></a>
       <div class="nav-actions">
         <button class="btn btn-icon btn-ghost" onclick="toggleTheme()" aria-label="Toggle theme" data-theme-icon></button>
         <button class="btn btn-ghost btn-sm" onclick="window.location.href='user-dashboard.html'">← Back to dashboard</button>
@@ -46,38 +46,52 @@
   </div>
 
   <div class="container">
-    <div class="profile-wrap card fade-up">
-      <div class="avatar-zone">
-        <div class="avatar-big" id="avatar-preview"></div>
-        <div class="avatar-actions">
-          <label class="btn btn-subtle btn-sm" for="avatar-file" style="cursor:pointer;">
-            Change photo
+    <div class="profile-layout">
+      <div class="card fade-up">
+        <div class="avatar-zone">
+          <div class="avatar-big" id="avatar-preview">?</div>
+          <div class="avatar-actions">
+            <label class="btn btn-subtle btn-sm" for="avatar-file" style="cursor:pointer;">Change photo</label>
             <input type="file" id="avatar-file" accept="image/*">
-          </label>
+          </div>
+          <span class="muted" style="font-size:12px;">JPG or PNG — visible to admins across the platform</span>
         </div>
-        <span class="readonly-hint">JPG or PNG — shown to admins across the platform</span>
+
+        <form id="profile-form" class="form-body">
+          <div class="two-col" style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">
+            <div class="field">
+              <label for="firstName">First name</label>
+              <input class="input" type="text" id="firstName" required>
+            </div>
+            <div class="field">
+              <label for="lastName">Last name</label>
+              <input class="input" type="text" id="lastName" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="email">Email address</label>
+            <input class="input" type="email" id="email" disabled>
+            <div class="field-hint">Email can't be changed here.</div>
+          </div>
+          <div class="field">
+            <label for="phone">Phone number</label>
+            <input class="input" type="text" id="phone" placeholder="e.g. 01012345678">
+          </div>
+          <div class="save-bar">
+            <button type="submit" class="btn btn-primary" id="save-btn"><span class="spinner"></span><span class="btn-label">Save changes</span></button>
+          </div>
+        </form>
       </div>
 
-      <form id="profile-form" class="form-body">
-        <div class="field">
-          <label for="name">Full name</label>
-          <input class="input" type="text" id="name" required>
+      <div class="card mycourses-card fade-up">
+        <div class="mycourses-head">
+          <h3>My courses</h3>
+          <p class="muted" style="font-size:13px; margin-top:3px;">Everything you're currently enrolled in.</p>
         </div>
-        <div class="field">
-          <label for="email">Email address</label>
-          <input class="input" type="email" id="email" disabled>
-          <div class="readonly-hint">Email can't be changed here.</div>
+        <div class="mycourses-list" id="mycourses-list">
+          <div style="padding:22px;" class="muted">Loading…</div>
         </div>
-        <div class="field">
-          <label for="phone">Phone number</label>
-          <input class="input" type="text" id="phone" placeholder="e.g. 010 1234 5678">
-        </div>
-        <div class="save-bar">
-          <button type="submit" class="btn btn-primary" id="save-btn">
-            <span class="spinner"></span><span class="btn-label">Save changes</span>
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 </div>
@@ -85,67 +99,91 @@
 <script src="common.js"></script>
 <script>
   const user = requireUser();
-  let base64Image = (user && user.avatar) || '';
+  let avatarFile = null;
 
-  function renderAvatar() {
+  function renderAvatarPreview(u) {
     const el = document.getElementById('avatar-preview');
-    if (base64Image) {
-      el.innerHTML = `<img src="${base64Image}" alt="">`;
-    } else {
-      el.textContent = initials(user ? user.name : '');
-    }
+    const url = uploadedFileUrl('users', u && u.imageUrl);
+    el.innerHTML = url ? `<img src="${url}" alt="">` : '';
+    if (!url) el.textContent = initials(fullName(u));
   }
 
-  if (user) {
-    document.getElementById('name').value = user.name || '';
-    document.getElementById('email').value = user.email || '';
-    document.getElementById('phone').value = user.phone || '';
-    renderAvatar();
-  }
-
-  document.getElementById('avatar-file').addEventListener('change', function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      toast('Please choose an image file.', 'error');
+  function renderMyCourses(myCourses) {
+    const list = document.getElementById('mycourses-list');
+    if (!myCourses || myCourses.length === 0) {
+      list.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 4.5A2.5 2.5 0 016.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15z"/></svg></div><h4>No courses yet</h4><p>Head to the dashboard to find your first course.</p></div>`;
       return;
     }
+    list.innerHTML = myCourses.map(c => {
+      const imgUrl = uploadedFileUrl('courses', c.imageUrl);
+      const coverStyle = imgUrl ? `background-image:url('${imgUrl}')` : `background:var(--brand-soft);color:var(--brand)`;
+      const coverInner = imgUrl ? '' : categoryIconSvg(c.category);
+      return `
+        <div class="mycourse-row">
+          <div class="mycourse-cover" style="${coverStyle}">${coverInner}</div>
+          <div style="flex:1; min-width:0;">
+            <div class="mycourse-title">${escapeHtml(c.title)}</div>
+            <div class="mycourse-meta">${escapeHtml(capitalizeWords(c.category))} · ${escapeHtml(c.duration || '')}</div>
+          </div>
+          <span class="price-tag" style="font-size:15px;">EGP ${c.price}</span>
+        </div>`;
+    }).join('');
+  }
+
+  async function loadProfile() {
+    try {
+      const data = await apiFetch('/auth/profile');
+      if (data.status === 'success') {
+        const u = data.data.user;
+        setSession(null, u);
+        document.getElementById('firstName').value = u.firstName || '';
+        document.getElementById('lastName').value = u.lastName || '';
+        document.getElementById('email').value = u.email || '';
+        document.getElementById('phone').value = u.phone || '';
+        renderAvatarPreview(u);
+        renderMyCourses(u.myCourses || []);
+      }
+    } catch (err) {
+      console.error('Error loading profile:', err);
+      if (user) { renderAvatarPreview(user); document.getElementById('firstName').value = user.firstName || ''; document.getElementById('lastName').value = user.lastName || ''; document.getElementById('email').value = user.email || ''; document.getElementById('phone').value = user.phone || ''; }
+    }
+  }
+  if (user) loadProfile();
+
+  document.getElementById('avatar-file').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast('Please choose an image file.', 'error'); return; }
+    avatarFile = file;
     const reader = new FileReader();
-    reader.onload = function (event) {
-      base64Image = event.target.result;
-      renderAvatar();
-    };
+    reader.onload = (ev) => { document.getElementById('avatar-preview').innerHTML = `<img src="${ev.target.result}" alt="">`; };
     reader.readAsDataURL(file);
   });
 
   document.getElementById('profile-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const saveBtn = document.getElementById('save-btn');
-    const updatedData = {
-      name: document.getElementById('name').value,
-      phone: document.getElementById('phone').value,
-      avatar: base64Image
-    };
+    const fd = new FormData();
+    fd.append('firstName', document.getElementById('firstName').value.trim());
+    fd.append('lastName', document.getElementById('lastName').value.trim());
+    const phone = document.getElementById('phone').value.trim();
+    if (phone) fd.append('phone', phone);
+    if (avatarFile) fd.append('imageUrl', avatarFile);
 
     setButtonLoading(saveBtn, true);
     try {
-      const res = await fetch(`${API_BASE}/auth/users/${user.id}/profile`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedData)
-      });
-      const data = await res.json();
-
+      const data = await apiFetch('/auth/profile', { method: 'PATCH', body: fd });
       if (data.status === 'success') {
-        localStorage.setItem('user', JSON.stringify(data.data.user));
-        toast('Profile updated successfully!', 'success', 1200);
-        setTimeout(() => window.location.href = 'user-dashboard.html', 400);
+        setSession(null, data.data.user);
+        renderAvatarPreview(data.data.user);
+        avatarFile = null;
+        toast('Profile updated successfully!', 'success');
       } else {
         toast(data.message || 'Failed to update profile', 'error');
       }
     } catch (err) {
       console.error('Error updating profile:', err);
-      toast('Could not reach the server. Is the backend running?', 'error');
+      if (err.message !== 'Unauthorized') toast('Could not reach the server. Is the backend running?', 'error');
     } finally {
       setButtonLoading(saveBtn, false);
     }
