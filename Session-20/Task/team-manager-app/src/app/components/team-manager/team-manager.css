@@ -1,0 +1,139 @@
+.dashboard-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #333;
+}
+
+.controls-panel {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 2rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+input, select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.btn-add {
+  background: #0d6efd;
+  color: white;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.btn-add:hover { background: #0b5ed7; }
+
+hr {
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid #dee2e6;
+}
+
+.filters-row {
+  display: flex;
+  gap: 2rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-weight: 500;
+}
+
+.team-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.team-wrapper.list-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.member-card {
+  border: 1px solid #d1d5db;
+  padding: 1rem;
+  border-radius: 10px;
+  background: white;
+  transition: 0.2s;
+}
+.member-card h4 { margin: 0 0 10px 0; font-size: 1.2rem; }
+.member-card p { margin: 5px 0; font-size: 0.9rem; }
+
+.member-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+}
+
+.unavailable-card, .unavailable-item {
+  background: #fff5f5;
+  border-color: #fecaca;
+}
+
+.badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.badge-active { background: #dcfce7; color: #166534; }
+.badge-inactive { background: #fee2e2; color: #991b1b; }
+
+.btn-toggle, .btn-toggle-sm {
+  background: #374151;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+}
+.btn-toggle-sm {
+  width: auto;
+  margin-top: 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  background: #f3f4f6;
+  border-radius: 8px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.error-msg {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}

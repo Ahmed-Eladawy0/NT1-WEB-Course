@@ -1,0 +1,98 @@
+<div class="dashboard-container">
+  <h1>👩‍💻 Team Manager Dashboard</h1>
+
+  <div class="controls-panel">
+    
+    <div class="add-form">
+      <h3>Add New Member</h3>
+      <div class="form-row">
+        <input type="text" [(ngModel)]="newMember.name" placeholder="Member Name">
+        <input type="number" [(ngModel)]="newMember.age" placeholder="Age">
+        
+        <select [(ngModel)]="newMember.department">
+          @for (dept of departments; track dept) {
+            <option [value]="dept">{{ dept }}</option>
+          }
+        </select>
+
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="newMember.isAvailable"> Available
+        </label>
+        
+        <button class="btn-add" (click)="addMember()">Add Member</button>
+      </div>
+      
+      @if (formError) {
+        <p class="error-msg">⚠️ Please fill all fields completely.</p>
+      }
+    </div>
+
+    <hr>
+
+    <div class="filters-row">
+      <div class="filter-group">
+        <label>Filter by Department:</label>
+        <select [(ngModel)]="selectedDept">
+          <option value="All">All Departments</option>
+          @for (dept of departments; track dept) {
+            <option [value]="dept">{{ dept }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>View Mode:</label>
+        <select [(ngModel)]="viewMode">
+          <option value="card">Card View</option>
+          <option value="list">List View</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <h2>Team Members</h2>
+
+  @if (team.length === 0) {
+    <div class="empty-state">No members exist in the team yet. Start adding some!</div>
+  } @else if (!hasMatchingMembers()) {
+    <div class="empty-state">No members match the selected department ({{ selectedDept }}).</div>
+  } @else {
+    
+    <div class="team-wrapper" [class.list-layout]="viewMode === 'list'">
+      @for (member of team; track member.name) {
+        
+        @if (selectedDept === 'All' || member.department === selectedDept) {
+          
+          @switch (viewMode) {
+            
+            @case ('card') {
+              <div class="member-card" [class.unavailable-card]="!member.isAvailable">
+                <h4>{{ member.name }}</h4>
+                <p><strong>Age:</strong> {{ member.age }}</p>
+                <p><strong>Dept:</strong> {{ member.department }}</p>
+                <p><strong>Status:</strong> 
+                  <span class="badge" [class.badge-active]="member.isAvailable" [class.badge-inactive]="!member.isAvailable">
+                    {{ member.isAvailable ? 'Available' : 'Unavailable' }}
+                  </span>
+                </p>
+                <button class="btn-toggle" (click)="toggleAvailability(member)">Toggle Status</button>
+              </div>
+            }
+
+            @case ('list') {
+              <div class="member-list-item" [class.unavailable-item]="!member.isAvailable">
+                <div class="info">
+                  <strong>{{ member.name }}</strong> - {{ member.department }} - 
+                  <span class="badge" [class.badge-active]="member.isAvailable" [class.badge-inactive]="!member.isAvailable">
+                    {{ member.isAvailable ? '✔️ Available' : '❌ Unavailable' }}
+                  </span>
+                </div>
+                <button class="btn-toggle-sm" (click)="toggleAvailability(member)">Toggle</button>
+              </div>
+            }
+          }
+        }
+      }
+    </div>
+  }
+</div>
