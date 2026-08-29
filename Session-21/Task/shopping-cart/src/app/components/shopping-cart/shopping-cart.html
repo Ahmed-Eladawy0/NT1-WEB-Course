@@ -1,0 +1,49 @@
+<div class="store-container">
+  <h1>🛒 Shopping Cart (Signals)</h1>
+
+  <div class="layout-grid">
+    
+    <div class="products-section">
+      <h2>Available Products</h2>
+      <div class="products-grid">
+        @for (product of availableProducts; track product.id) {
+          <div class="card">
+            <h3>{{ product.name }}</h3>
+            <p class="price">{{ product.price }} EGP</p>
+            <button class="btn-add" (click)="addToCart(product)">Add To Cart</button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="cart-section">
+      <h2>Your Cart</h2>
+      
+      <div class="cart-items">
+        <!-- 4. Display Cart Items -->
+        @for (product of cart(); track $index) {
+          <div class="cart-item">
+            <div class="item-info">
+              <strong>{{ product.name }}</strong>
+              <span class="item-price">{{ product.price }} EGP</span>
+            </div>
+            <button class="btn-remove" (click)="removeFromCart(product.id)">Remove</button>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>Your cart is empty 🛒</p>
+          </div>
+        }
+      </div>
+
+      @if (cart().length > 0) {
+        <div class="cart-summary">
+          <!-- 6. Display Total Price -->
+          <h3>Total: {{ totalPrice() }} EGP</h3>
+          <button class="btn-clear" (click)="clearCart()">Clear Cart</button>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>
