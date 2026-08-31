@@ -1,0 +1,14 @@
+@if (confirmService.state().open) {
+  <div class="modal-overlay" (click)="onOverlayClick($event)">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3>{{ confirmService.state().title }}</h3>
+      <p>{{ confirmService.state().message }}</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" (click)="cancel()">Cancel</button>
+        <button class="btn" [class.btn-danger]="confirmService.state().danger" [class.btn-primary]="!confirmService.state().danger" (click)="confirm()">
+          {{ confirmService.state().confirmLabel }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

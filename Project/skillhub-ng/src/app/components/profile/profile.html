@@ -1,0 +1,76 @@
+<div class="page">
+  <app-header roleLabel="learner" brandLink="/dashboard"></app-header>
+
+  <div class="container">
+    <div class="profile-layout">
+      <div class="card fade-up">
+        <div class="avatar-zone">
+          <div class="avatar-big">
+            @if (avatarUrl) { <img [src]="avatarUrl" alt=""> } @else { {{ avatarInitials }} }
+          </div>
+          <div class="avatar-actions">
+            <label class="btn btn-subtle btn-sm" for="avatar-file" style="cursor:pointer;">Change photo</label>
+            <input type="file" id="avatar-file" accept="image/*" (change)="onAvatarChange($event)">
+          </div>
+          <span class="muted" style="font-size:12px;">JPG or PNG — visible to admins across the platform</span>
+        </div>
+
+        <form class="form-body" (ngSubmit)="onSubmit()">
+          <div class="two-col">
+            <div class="field">
+              <label for="firstName">First name</label>
+              <input class="input" type="text" id="firstName" name="firstName" [(ngModel)]="firstName" required>
+            </div>
+            <div class="field">
+              <label for="lastName">Last name</label>
+              <input class="input" type="text" id="lastName" name="lastName" [(ngModel)]="lastName" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="email">Email address</label>
+            <input class="input" type="email" id="email" [ngModel]="email" name="email" disabled>
+            <div class="field-hint">Email can't be changed here.</div>
+          </div>
+          <div class="field">
+            <label for="phone">Phone number</label>
+            <input class="input" type="text" id="phone" name="phone" placeholder="e.g. 01012345678" [(ngModel)]="phone">
+          </div>
+          <div class="save-bar">
+            <button type="submit" class="btn btn-primary" [class.is-loading]="saving" [disabled]="saving">
+              <span class="spinner"></span><span class="btn-label">Save changes</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card mycourses-card fade-up">
+        <div class="mycourses-head">
+          <h3>My courses</h3>
+          <p class="muted" style="font-size:13px; margin-top:3px;">Everything you're currently enrolled in.</p>
+        </div>
+        <div class="mycourses-list">
+          @if (loadingCourses) {
+            <div style="padding:22px;" class="muted">Loading…</div>
+          } @else if (myCourses.length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 4.5A2.5 2.5 0 016.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15z"/></svg></div>
+              <h4>No courses yet</h4>
+              <p>Head to the dashboard to find your first course.</p>
+            </div>
+          } @else {
+            @for (c of myCourses; track c._id) {
+              <div class="mycourse-row">
+                <div class="mycourse-cover" [ngStyle]="courseCoverStyle(c)" [innerHTML]="courseCoverIcon(c)"></div>
+                <div style="flex:1; min-width:0;">
+                  <div class="mycourse-title">{{ c.title }}</div>
+                  <div class="mycourse-meta">{{ capitalize(c.category) }} · {{ c.duration }}</div>
+                </div>
+                <span class="price-tag" style="font-size:15px;">EGP {{ c.price }}</span>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
