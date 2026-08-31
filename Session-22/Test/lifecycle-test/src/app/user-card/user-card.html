@@ -1,0 +1,16 @@
+<div class="card">
+    <ng-content></ng-content>
+
+    <h3>
+        {{user().name}}
+    </h3>
+
+    <p>
+        Role:
+        {{user().role}}
+    </p>
+
+    <button (click)="removeUser()">
+        Delete
+    </button>
+</div>

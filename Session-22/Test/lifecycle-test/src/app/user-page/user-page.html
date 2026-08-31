@@ -1,0 +1,12 @@
+<h1>Users Management</h1>
+
+<div style="display: flex; gap: 15px;">
+    @for(user of users; track user.id) {
+        <app-user-card 
+            [user]="user" 
+            (deleteUser)="removeUser($event)"
+        >
+            <p style="color: gray; font-size: 12px; margin: 0;">User Information</p>
+        </app-user-card>
+    }
+</div>
