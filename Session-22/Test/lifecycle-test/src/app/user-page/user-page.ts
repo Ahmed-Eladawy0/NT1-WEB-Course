@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { User } from '../models/user';
-import { UserCardComponent } from '../user-card/user-card'; // 👈 استدعاء الابن
+import { UserCardComponent } from '../user-card/user-card'; 
 
 @Component({
   selector: 'app-user-page',
