@@ -1,0 +1,22 @@
+<td>
+  <div class="cell-name">
+    <span class="avatar" style="width:30px;height:30px;font-size:11px;">
+      @if (avatarUrl; as url) { <img [src]="url" alt=""> } @else { {{ fullName(user()).charAt(0) }} }
+    </span>
+    {{ fullName(user()) }}
+  </div>
+</td>
+<td class="muted">{{ user().email }}</td>
+<td class="muted">{{ user().phone || '—' }}</td>
+<td><strong>{{ enrolledCount }}</strong> <span class="muted" style="font-size:12.5px">course{{ enrolledCount === 1 ? '' : 's' }}</span></td>
+<td><span class="pill" [class.role-admin]="user().role === 'admin'" [class.role-user]="user().role !== 'admin'">{{ user().role }}</span></td>
+<td>
+  <div class="row gap-8">
+    <button type="button" class="btn btn-sm btn-subtle" [class.is-loading]="togglingId() === user()._id" [disabled]="togglingId() === user()._id" (click)="toggleRole()">
+      <span class="spinner"></span><span class="btn-label">{{ user().role === 'admin' ? 'Make student' : 'Make admin' }}</span>
+    </button>
+    <button type="button" class="action-icon-btn danger" title="Delete user" [disabled]="isSelf || deletingId() === user()._id" (click)="deleteUser()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6h16z"/></svg>
+    </button>
+  </div>
+</td>

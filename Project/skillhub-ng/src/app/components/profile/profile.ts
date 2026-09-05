@@ -1,5 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms'; 
 import { NgStyle } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Header } from '../../shared/header/header';
@@ -10,7 +10,8 @@ import { capitalizeWords, categoryIconSvg, fullName, initials, uploadedFileUrl }
 
 @Component({
   selector: 'app-profile',
-  imports: [FormsModule, NgStyle, Header],
+  standalone: true,
+  imports: [ReactiveFormsModule, NgStyle, Header],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -19,21 +20,23 @@ export class Profile implements OnInit {
   private toast = inject(ToastService);
   private sanitizer = inject(DomSanitizer);
 
-  loadingCourses = true;
-  saving = false;
+  loadingCourses = signal(true);
+  saving = signal(false);
+  myCourses = signal<Course[]>([]);
+  email = signal(''); 
+  
   avatarFile: File | null = null;
-  avatarPreviewUrl: string | null = null;
-  myCourses: Course[] = [];
+  avatarPreviewUrl = signal<string | null>(null);
 
-  firstName = '';
-  lastName = '';
-  email = '';
-  phone = '';
+  profileForm = new FormGroup({
+    firstName: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    lastName: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    phone: new FormControl('', [Validators.pattern('^[0-9+]*$')]) // أرقام بس
+  });
 
   capitalize = capitalizeWords;
 
   async ngOnInit(): Promise<void> {
-    // seed the form from whatever we already have, then refresh from the server
     const cached = this.auth.user();
     if (cached) this.populateForm(cached, cached.myCourses as Course[] | undefined);
 
@@ -43,20 +46,23 @@ export class Profile implements OnInit {
     } catch (err) {
       console.error('Error loading profile:', err);
     } finally {
-      this.loadingCourses = false;
+      this.loadingCourses.set(false);
     }
   }
 
   private populateForm(user: User, myCourses: Course[] | undefined): void {
-    this.firstName = user.firstName || '';
-    this.lastName = user.lastName || '';
-    this.email = user.email || '';
-    this.phone = user.phone || '';
-    this.myCourses = (myCourses || []).filter((c): c is Course => typeof c === 'object');
+    this.profileForm.patchValue({
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      phone: user.phone || ''
+    });
+    
+    this.email.set(user.email || '');
+    this.myCourses.set((myCourses || []).filter((c): c is Course => typeof c === 'object'));
   }
 
   get avatarUrl(): string | null {
-    return this.avatarPreviewUrl || uploadedFileUrl('users', this.auth.user()?.imageUrl);
+    return this.avatarPreviewUrl() || uploadedFileUrl('users', this.auth.user()?.imageUrl);
   }
   get avatarInitials(): string {
     return initials(fullName(this.auth.user()));
@@ -73,7 +79,7 @@ export class Profile implements OnInit {
     this.avatarFile = file;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      this.avatarPreviewUrl = ev.target?.result as string;
+      this.avatarPreviewUrl.set(ev.target?.result as string);
     };
     reader.readAsDataURL(file);
   }
@@ -82,24 +88,32 @@ export class Profile implements OnInit {
     const url = uploadedFileUrl('courses', course.imageUrl);
     return url ? { 'background-image': `url('${url}')` } : { background: 'var(--brand-soft)', color: 'var(--brand)' };
   }
+  
   courseCoverIcon(course: Course): SafeHtml | null {
     if (uploadedFileUrl('courses', course.imageUrl)) return null;
     return this.sanitizer.bypassSecurityTrustHtml(categoryIconSvg(course.category));
   }
 
   async onSubmit(): Promise<void> {
-    this.saving = true;
+    if (this.profileForm.invalid) {
+      this.profileForm.markAllAsTouched();
+      return;
+    }
+
+    this.saving.set(true);
+    const formValues = this.profileForm.value;
     const fd = new FormData();
-    fd.append('firstName', this.firstName.trim());
-    fd.append('lastName', this.lastName.trim());
-    if (this.phone.trim()) fd.append('phone', this.phone.trim());
+    
+    fd.append('firstName', formValues.firstName?.trim() || '');
+    fd.append('lastName', formValues.lastName?.trim() || '');
+    if (formValues.phone?.trim()) fd.append('phone', formValues.phone.trim());
     if (this.avatarFile) fd.append('imageUrl', this.avatarFile);
 
     try {
       const data = await this.auth.updateProfile(fd);
       if (data.status === 'success') {
         this.avatarFile = null;
-        this.avatarPreviewUrl = null;
+        this.avatarPreviewUrl.set(null);
         this.toast.success('Profile updated successfully!');
       } else {
         this.toast.error(data.message || 'Failed to update profile');
@@ -108,7 +122,7 @@ export class Profile implements OnInit {
       console.error('Error updating profile:', err);
       this.toast.error(err?.error?.message || 'Could not reach the server. Is the backend running?');
     } finally {
-      this.saving = false;
+      this.saving.set(false);
     }
   }
 }

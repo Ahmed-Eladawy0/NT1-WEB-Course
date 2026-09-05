@@ -1,0 +1,78 @@
+<div class="form-container">
+  <h2>Add New Course</h2>
+  
+  <form [formGroup]="addCourseForm" (ngSubmit)="onSubmit()">
+    
+    <div class="form-group">
+      <label for="title">Course Title</label>
+      <input id="title" type="text" formControlName="title" placeholder="e.g. Angular Advanced Guide" />
+      @if (addCourseForm.get('title')?.invalid && addCourseForm.get('title')?.touched) {
+        @if (addCourseForm.get('title')?.errors?.['required']) { <div class="error-msg">* Course title is required</div> }
+        @if (addCourseForm.get('title')?.errors?.['minlength']) { <div class="error-msg">* Must be at least 3 characters</div> }
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="instructor">Instructor Name</label>
+      <input id="instructor" type="text" formControlName="instructor" placeholder="e.g. Adawy" />
+      @if (addCourseForm.get('instructor')?.invalid && addCourseForm.get('instructor')?.touched) {
+        <div class="error-msg">* Instructor name is required</div>
+      }
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col">
+        <label for="category">Category</label>
+        <select id="category" formControlName="category">
+          <option value="" disabled selected>Select Category</option>
+          @for (cat of categories; track $index) {
+            <option [value]="cat">{{ cat | titlecase }}</option>
+          }
+        </select>
+        @if (addCourseForm.get('category')?.invalid && addCourseForm.get('category')?.touched) {
+          <div class="error-msg">* Category is required</div>
+        }
+      </div>
+
+      <div class="form-group col">
+        <label for="level">Course Level</label>
+        <select id="level" formControlName="level">
+          <option value="" disabled selected>Select Level</option>
+          @for (lev of levels; track $index) {
+            <option [value]="lev">{{ lev | titlecase }}</option>
+          }
+        </select>
+        @if (addCourseForm.get('level')?.invalid && addCourseForm.get('level')?.touched) {
+          <div class="error-msg">* Course level is required</div>
+        }
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col">
+        <label for="price">Price (EGP)</label>
+        <input id="price" type="number" formControlName="price" step="0.01" />
+        @if (addCourseForm.get('price')?.invalid && addCourseForm.get('price')?.touched) {
+          <div class="error-msg">* Valid price is required (Min 0)</div>
+        }
+      </div>
+
+      <div class="form-group col">
+        <label for="duration">Duration</label>
+        <input id="duration" type="text" formControlName="duration" placeholder="e.g. 12 Hours" />
+        @if (addCourseForm.get('duration')?.invalid && addCourseForm.get('duration')?.touched) {
+          <div class="error-msg">* Duration is required</div>
+        }
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" rows="4" formControlName="description" placeholder="Describe the course content..."></textarea>
+    </div>
+
+    <button type="submit" class="submit-btn" [disabled]="addCourseForm.invalid">
+      Create Course
+    </button>
+  </form>
+</div>

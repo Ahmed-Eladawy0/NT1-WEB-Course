@@ -10,23 +10,23 @@
     <div class="card filters-bar">
       <div class="input-icon-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input class="input" type="text" placeholder="Search courses by title..." [(ngModel)]="searchTitle" (ngModelChange)="applyFilters()">
+        <input class="input" type="text" placeholder="Search courses by title..." [ngModel]="searchTitle()" (ngModelChange)="searchTitle.set($event)">
       </div>
-      <select class="input" [(ngModel)]="filterCategory" (ngModelChange)="applyFilters()">
+      <select class="input" [ngModel]="filterCategory()" (ngModelChange)="filterCategory.set($event)">
         <option value="">All categories</option>
-        @for (cat of categories; track cat) {
+        @for (cat of categories(); track cat) {
           <option [value]="cat">{{ capitalize(cat) }}</option>
         }
       </select>
-      <input class="input price-input" type="number" placeholder="Max price (EGP)" [(ngModel)]="maxPrice" (ngModelChange)="applyFilters()">
+      <input class="input price-input" type="number" placeholder="Max price (EGP)" [ngModel]="maxPrice()" (ngModelChange)="maxPrice.set($event)">
       <button class="btn btn-ghost btn-sm" (click)="clearFilters()">Clear</button>
     </div>
 
     <div class="results-row">
-      <span class="muted" style="font-size:13.5px;">{{ filteredCourses.length }} course{{ filteredCourses.length === 1 ? '' : 's' }} found</span>
+      <span class="muted" style="font-size:13.5px;">{{ filteredCourses().length }} course{{ filteredCourses().length === 1 ? '' : 's' }} found</span>
     </div>
 
-    @if (loading) {
+    @if (loading()) {
       <div class="courses-grid">
         @for (i of [1,2,3,4,5,6]; track i) {
           <div class="card course-card skeleton-card">
@@ -37,7 +37,7 @@
           </div>
         }
       </div>
-    } @else if (filteredCourses.length === 0) {
+    } @else if (filteredCourses().length === 0) {
       <div class="empty-state">
         <div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
         <h4>No courses match your filters</h4>
@@ -45,7 +45,8 @@
       </div>
     } @else {
       <div class="courses-grid">
-        @for (course of filteredCourses; track course._id) {
+        <!-- استخدام filteredCourses() كـ Signal -->
+        @for (course of filteredCourses(); track course._id) {
           <div class="card course-card fade-up">
             @if (coverImage(course); as img) {
               <div class="course-cover" [style.background-image]="'url(' + img + ')'"></div>
