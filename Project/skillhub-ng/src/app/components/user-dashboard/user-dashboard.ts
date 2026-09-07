@@ -56,35 +56,40 @@ export class UserDashboard implements OnInit {
     return this.auth.user()?.firstName || 'there';
   }
 
-  async ngOnInit(): Promise<void> {
-    await Promise.all([this.refreshProfile(), this.fetchCourses()]);
+  ngOnInit(): void {
+    this.refreshProfile();
+    this.fetchCourses();
   }
 
-  async refreshProfile(): Promise<void> {
-    try {
-      const user = await this.auth.refreshProfile();
-      const ids = new Set((user?.myCourses || []).map((c) => courseIdOf(c)!).filter(Boolean));
-      this.enrolledIds.set(ids);
-    } catch (err) {
-      console.error('Error refreshing profile:', err);
-    }
+  refreshProfile(): void {
+    this.auth.refreshProfile().subscribe({
+      next: (user) => {
+        const ids = new Set((user?.myCourses || []).map((c) => courseIdOf(c)!).filter(Boolean));
+        this.enrolledIds.set(ids);
+      },
+      error: (err) => {
+        console.error('Error refreshing profile:', err);
+      }
+    });
   }
 
-  async fetchCourses(): Promise<void> {
+  fetchCourses(): void {
     this.loading.set(true);
-    try {
-      const data = await this.courseService.getAll();
-      const courses = data.data?.courses || [];
-      this.allCourses.set(courses);
-      
-      const cats = [...new Set(courses.map((c: Course) => c.category).filter(Boolean))].sort() as string[];
-      this.categories.set(cats);
-    } catch (err) {
-      console.error('Error fetching courses:', err);
-      this.toast.error('Could not load courses. Is the backend running?');
-    } finally {
-      this.loading.set(false);
-    }
+    this.courseService.getAll().subscribe({
+      next: (data) => {
+        const courses = data.data?.courses || [];
+        this.allCourses.set(courses);
+        
+        const cats = [...new Set(courses.map((c: Course) => c.category).filter(Boolean))].sort() as string[];
+        this.categories.set(cats);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error fetching courses:', err);
+        this.toast.error('Could not load courses. Is the backend running?');
+        this.loading.set(false);
+      }
+    });
   }
 
   clearFilters(): void {
@@ -101,30 +106,36 @@ export class UserDashboard implements OnInit {
     return this.enrollingIds().has(course._id);
   }
 
-  async enroll(course: Course): Promise<void> {
+  enroll(course: Course): void {
     const currentEnrolling = new Set(this.enrollingIds());
     currentEnrolling.add(course._id);
     this.enrollingIds.set(currentEnrolling);
 
-    try {
-      const data = await this.auth.enroll(course._id);
-      if (data.status === 'success') {
-        const currentEnrolled = new Set(this.enrolledIds());
-        currentEnrolled.add(course._id);
-        this.enrolledIds.set(currentEnrolled);
-        
-        this.toast.success(`Enrolled in "${course.title}"`);
-      } else {
-        this.toast.error(data.message || 'Failed to enroll');
+    this.auth.enroll(course._id).subscribe({
+      next: (data) => {
+        if (data.status === 'success') {
+          const currentEnrolled = new Set(this.enrolledIds());
+          currentEnrolled.add(course._id);
+          this.enrolledIds.set(currentEnrolled);
+          
+          this.toast.success(`Enrolled in "${course.title}"`);
+        } else {
+          this.toast.error(data.message || 'Failed to enroll');
+        }
+        this.removeEnrolling(course._id);
+      },
+      error: (err) => {
+        console.error('Error enrolling course:', err);
+        this.toast.error(err.message || 'Could not reach the server.');
+        this.removeEnrolling(course._id);
       }
-    } catch (err: any) {
-      console.error('Error enrolling course:', err);
-      this.toast.error(err?.error?.message || 'Could not reach the server.');
-    } finally {
-      const updatedEnrolling = new Set(this.enrollingIds());
-      updatedEnrolling.delete(course._id);
-      this.enrollingIds.set(updatedEnrolling);
-    }
+    });
+  }
+
+  private removeEnrolling(courseId: string): void {
+    const updatedEnrolling = new Set(this.enrollingIds());
+    updatedEnrolling.delete(courseId);
+    this.enrollingIds.set(updatedEnrolling);
   }
 
   /* ---- display helpers ---- */

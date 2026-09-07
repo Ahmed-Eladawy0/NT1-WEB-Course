@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core'; // 👈 استدعينا signal و computed
+import { Component, inject, OnInit, signal, computed } from '@angular/core'; 
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Header } from '../../shared/header/header';
@@ -93,19 +93,22 @@ export class AdminDashboard implements OnInit {
     this.searchQuery.set(''); 
   }
 
-  async ngOnInit(): Promise<void> {
-    await Promise.all([this.fetchCourses(), this.fetchUsers()]);
+  ngOnInit(): void {
+    this.fetchCourses();
+    this.fetchUsers();
   }
 
   /* ---------------- Courses ---------------- */
-  async fetchCourses(): Promise<void> {
-    try {
-      const data = await this.courseService.getAll();
-      this.coursesCache.set(data.data?.courses || []); 
-    } catch (err) {
-      console.error('Error fetching courses:', err);
-      this.toast.error('Could not load courses.');
-    }
+  fetchCourses(): void {
+    this.courseService.getAll().subscribe({
+      next: (data) => {
+        this.coursesCache.set(data.data?.courses || []); 
+      },
+      error: (err) => {
+        console.error('Error fetching courses:', err);
+        this.toast.error('Could not load courses.');
+      }
+    });
   }
 
   rowCoverUrl(c: Course): string | null { return uploadedFileUrl('courses', c.imageUrl); }
@@ -130,11 +133,12 @@ export class AdminDashboard implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  async onSubmitCourse(): Promise<void> {
+  onSubmitCourse(): void {
     if (this.courseForm.invalid) {
       this.courseForm.markAllAsTouched();
       return;
     }
+    
     this.savingCourse = true;
     const formValues = this.courseForm.value;
     const fd = new FormData();
@@ -146,24 +150,27 @@ export class AdminDashboard implements OnInit {
     fd.append('duration', formValues.duration || '');
     if (this.coverFile) fd.append('imageUrl', this.coverFile);
 
-    try {
-      const data = this.isEditing
-        ? await this.courseService.update(this.courseId, fd)
-        : await this.courseService.create(fd);
+    const request$ = this.isEditing 
+      ? this.courseService.update(this.courseId, fd)
+      : this.courseService.create(fd);
 
-      if (data.status === 'success') {
-        this.toast.success(this.isEditing ? 'Course updated' : 'Course added');
-        this.resetCourseForm();
-        await this.fetchCourses();
-      } else {
-        this.toast.error(data.message || 'Failed to save course');
+    request$.subscribe({
+      next: (data) => {
+        if (data.status === 'success') {
+          this.toast.success(this.isEditing ? 'Course updated' : 'Course added');
+          this.resetCourseForm();
+          this.fetchCourses();
+        } else {
+          this.toast.error(data.message || 'Failed to save course');
+        }
+        this.savingCourse = false;
+      },
+      error: (err) => {
+        console.error('Error saving course:', err);
+        this.toast.error(err.message || 'Could not reach the server.');
+        this.savingCourse = false;
       }
-    } catch (err: any) {
-      console.error('Error saving course:', err);
-      this.toast.error(err?.error?.message || 'Could not reach the server.');
-    } finally {
-      this.savingCourse = false;
-    }
+    });
   }
 
   editCourse(c: Course): void {
@@ -197,48 +204,55 @@ export class AdminDashboard implements OnInit {
       confirmLabel: 'Delete',
     });
     if (!ok) return;
-    try {
-      const data = await this.courseService.remove(c._id);
-      if (data.status === 'success') {
-        this.toast.success('Course deleted');
-        await this.fetchCourses();
-      } else {
-        this.toast.error(data.message || 'Failed to delete');
+
+    this.courseService.remove(c._id).subscribe({
+      next: (data) => {
+        if (data.status === 'success') {
+          this.toast.success('Course deleted');
+          this.fetchCourses();
+        } else {
+          this.toast.error(data.message || 'Failed to delete');
+        }
+      },
+      error: (err) => {
+        this.toast.error(err.message || 'Error deleting.');
       }
-    } catch (err: any) {
-      this.toast.error(err?.error?.message || 'Error deleting.');
-    }
+    });
   }
 
   /* ---------------- Users ---------------- */
-  async fetchUsers(): Promise<void> {
-    try {
-      const data = await this.auth.getAllUsers();
-      this.usersCache.set(data.data?.users || []); 
-    } catch (err) {
-      this.toast.error('Could not load users.');
-    }
+  fetchUsers(): void {
+    this.auth.getAllUsers().subscribe({
+      next: (data) => {
+        this.usersCache.set(data.data?.users || []); 
+      },
+      error: (err) => {
+        this.toast.error('Could not load users.');
+      }
+    });
   }
 
   userAvatarUrl(u: User): string | null { return uploadedFileUrl('users', u.imageUrl); }
   userEnrolledCount(u: User): number { return u.myCourses ? u.myCourses.length : 0; }
   isSelf(u: User): boolean { return u._id === this.currentUserId; }
 
-  async toggleRole(u: User): Promise<void> {
+  toggleRole(u: User): void {
     this.togglingRoleId = u._id;
-    try {
-      const data = await this.auth.toggleUserRole(u._id);
-      if (data.status === 'success') {
-        this.toast.success('Role updated');
-        await this.fetchUsers();
-      } else {
-        this.toast.error(data.message || 'Could not update role.');
+    this.auth.toggleUserRole(u._id).subscribe({
+      next: (data) => {
+        if (data.status === 'success') {
+          this.toast.success('Role updated');
+          this.fetchUsers();
+        } else {
+          this.toast.error(data.message || 'Could not update role.');
+        }
+        this.togglingRoleId = null;
+      },
+      error: (err) => {
+        this.toast.error(err.message || 'Could not update role.');
+        this.togglingRoleId = null;
       }
-    } catch (err: any) {
-      this.toast.error(err?.error?.message || 'Could not update role.');
-    } finally {
-      this.togglingRoleId = null;
-    }
+    });
   }
 
   async deleteUser(u: User): Promise<void> {
@@ -248,19 +262,22 @@ export class AdminDashboard implements OnInit {
       confirmLabel: 'Delete user',
     });
     if (!ok) return;
+    
     this.deletingUserId = u._id;
-    try {
-      const data = await this.auth.deleteUser(u._id);
-      if (data.status === 'success') {
-        this.toast.success('User deleted');
-        await this.fetchUsers();
-      } else {
-        this.toast.error(data.message || 'Failed to delete');
+    this.auth.deleteUser(u._id).subscribe({
+      next: (data) => {
+        if (data.status === 'success') {
+          this.toast.success('User deleted');
+          this.fetchUsers();
+        } else {
+          this.toast.error(data.message || 'Failed to delete');
+        }
+        this.deletingUserId = null;
+      },
+      error: (err) => {
+        this.toast.error(err.message || 'Error deleting.');
+        this.deletingUserId = null;
       }
-    } catch (err: any) {
-      this.toast.error(err?.error?.message || 'Error deleting.');
-    } finally {
-      this.deletingUserId = null;
-    }
+    });
   }
 }

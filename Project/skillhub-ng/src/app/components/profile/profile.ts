@@ -31,23 +31,30 @@ export class Profile implements OnInit {
   profileForm = new FormGroup({
     firstName: new FormControl('', [Validators.required, Validators.minLength(2)]),
     lastName: new FormControl('', [Validators.required, Validators.minLength(2)]),
-    phone: new FormControl('', [Validators.pattern('^[0-9+]*$')]) // أرقام بس
+    phone: new FormControl('', [Validators.pattern('^[0-9+]*$')])
   });
 
   capitalize = capitalizeWords;
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     const cached = this.auth.user();
-    if (cached) this.populateForm(cached, cached.myCourses as Course[] | undefined);
-
-    try {
-      const user = await this.auth.refreshProfile();
-      if (user) this.populateForm(user, user.myCourses as Course[] | undefined);
-    } catch (err) {
-      console.error('Error loading profile:', err);
-    } finally {
-      this.loadingCourses.set(false);
+    if (cached) {
+      this.populateForm(cached, cached.myCourses as Course[] | undefined);
     }
+
+    // 🔥 شلنا الـ async/await واستخدمنا subscribe
+    this.auth.refreshProfile().subscribe({
+      next: (user) => {
+        if (user) {
+          this.populateForm(user, user.myCourses as Course[] | undefined);
+        }
+        this.loadingCourses.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading profile:', err);
+        this.loadingCourses.set(false);
+      }
+    });
   }
 
   private populateForm(user: User, myCourses: Course[] | undefined): void {
@@ -94,7 +101,7 @@ export class Profile implements OnInit {
     return this.sanitizer.bypassSecurityTrustHtml(categoryIconSvg(course.category));
   }
 
-  async onSubmit(): Promise<void> {
+  onSubmit(): void {
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
       return;
@@ -109,20 +116,22 @@ export class Profile implements OnInit {
     if (formValues.phone?.trim()) fd.append('phone', formValues.phone.trim());
     if (this.avatarFile) fd.append('imageUrl', this.avatarFile);
 
-    try {
-      const data = await this.auth.updateProfile(fd);
-      if (data.status === 'success') {
-        this.avatarFile = null;
-        this.avatarPreviewUrl.set(null);
-        this.toast.success('Profile updated successfully!');
-      } else {
-        this.toast.error(data.message || 'Failed to update profile');
+    this.auth.updateProfile(fd).subscribe({
+      next: (data) => {
+        if (data.status === 'success') {
+          this.avatarFile = null;
+          this.avatarPreviewUrl.set(null);
+          this.toast.success('Profile updated successfully!');
+        } else {
+          this.toast.error(data.message || 'Failed to update profile');
+        }
+        this.saving.set(false);
+      },
+      error: (err) => {
+        console.error('Error updating profile:', err);
+        this.toast.error(err.message || 'Could not reach the server.');
+        this.saving.set(false);
       }
-    } catch (err: any) {
-      console.error('Error updating profile:', err);
-      this.toast.error(err?.error?.message || 'Could not reach the server. Is the backend running?');
-    } finally {
-      this.saving.set(false);
-    }
+    });
   }
 }

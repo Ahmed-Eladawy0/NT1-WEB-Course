@@ -49,37 +49,41 @@ export class LoginComponent {
     reader.readAsDataURL(file);
   }
 
-  async onSubmit(): Promise<void> {
+  onSubmit(): void {
     this.isLoading = true;
-    try {
-      let data;
-      if (this.isLogin) {
-        data = await this.auth.login(this.email.trim(), this.password);
-      } else {
-        const fd = new FormData();
-        fd.append('firstName', this.firstName.trim());
-        fd.append('lastName', this.lastName.trim());
-        fd.append('email', this.email.trim());
-        fd.append('password', this.password);
-        if (this.phone.trim()) fd.append('phone', this.phone.trim());
-        if (this.avatarFile) fd.append('imageUrl', this.avatarFile);
-        data = await this.auth.signup(fd);
-      }
 
-      if (data.status === 'success' && data.data) {
-        this.toast.success(this.isLogin ? 'Welcome back!' : 'Account created — welcome!', 1200);
-        setTimeout(() => {
-          this.router.navigateByUrl(data.data!.user.role === 'admin' ? '/admin' : '/dashboard');
-        }, 300);
-      } else {
-        this.toast.error(data.message || 'Something went wrong');
+    const request$ = this.isLogin
+      ? this.auth.login(this.email.trim(), this.password)
+      : this.createSignupFormData();
+
+    request$.subscribe({
+      next: (data) => {
+        if (data.status === 'success' && data.data) {
+          this.toast.success(this.isLogin ? 'Welcome back!' : 'Account created — welcome!', 1200);
+          setTimeout(() => {
+            this.router.navigateByUrl(data.data!.user.role === 'admin' ? '/admin' : '/dashboard');
+          }, 300);
+        } else {
+          this.toast.error(data.message || 'Something went wrong');
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.toast.error(err.message || 'Could not reach the server.');
+        this.isLoading = false;
       }
-    } catch (err: any) {
-      console.error(err);
-      const message = err?.error?.message || 'Could not reach the server. Is the backend running?';
-      this.toast.error(message);
-    } finally {
-      this.isLoading = false;
-    }
+    });
+  }
+
+  private createSignupFormData() {
+    const fd = new FormData();
+    fd.append('firstName', this.firstName.trim());
+    fd.append('lastName', this.lastName.trim());
+    fd.append('email', this.email.trim());
+    fd.append('password', this.password);
+    if (this.phone.trim()) fd.append('phone', this.phone.trim());
+    if (this.avatarFile) fd.append('imageUrl', this.avatarFile);
+    return this.auth.signup(fd);
   }
 }

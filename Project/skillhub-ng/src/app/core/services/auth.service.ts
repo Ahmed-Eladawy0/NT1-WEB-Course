@@ -1,7 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { Observable, tap, map } from 'rxjs'; 
 import { API_BASE } from '../utils';
 import { ApiResponse, User } from '../models/models';
 
@@ -10,7 +10,8 @@ export class AuthService {
   readonly user = signal<User | null>(this.readStoredUser());
   readonly token = signal<string | null>(localStorage.getItem('token'));
 
-  constructor(private http: HttpClient, private router: Router) {}
+  private http = inject(HttpClient);
+  private router = inject(Router);
 
   private readStoredUser(): User | null {
     try {
@@ -52,61 +53,61 @@ export class AuthService {
     this.router.navigateByUrl('/login');
   }
 
-  async login(email: string, password: string): Promise<ApiResponse<{ user: User }>> {
-    const data = await firstValueFrom(
-      this.http.post<ApiResponse<{ user: User }>>(`${API_BASE}/auth/login`, { email, password })
+  login(email: string, password: string): Observable<ApiResponse<{ user: User }>> {
+    return this.http.post<ApiResponse<{ user: User }>>(`${API_BASE}/auth/login`, { email, password }).pipe(
+      tap(data => {
+        if (data.status === 'success' && data.data) {
+          this.setSession(data.token ?? null, data.data.user);
+        }
+      })
     );
-    if (data.status === 'success' && data.data) {
-      this.setSession(data.token ?? null, data.data.user);
-    }
-    return data;
   }
 
-  async signup(formData: FormData): Promise<ApiResponse<{ user: User }>> {
-    const data = await firstValueFrom(
-      this.http.post<ApiResponse<{ user: User }>>(`${API_BASE}/auth/signup`, formData)
+  signup(formData: FormData): Observable<ApiResponse<{ user: User }>> {
+    return this.http.post<ApiResponse<{ user: User }>>(`${API_BASE}/auth/signup`, formData).pipe(
+      tap(data => {
+        if (data.status === 'success' && data.data) {
+          this.setSession(data.token ?? null, data.data.user);
+        }
+      })
     );
-    if (data.status === 'success' && data.data) {
-      this.setSession(data.token ?? null, data.data.user);
-    }
-    return data;
   }
 
-  async refreshProfile(): Promise<User | null> {
-    const data = await firstValueFrom(this.http.get<ApiResponse<{ user: User }>>(`${API_BASE}/auth/profile`));
-    if (data.status === 'success' && data.data) {
-      this.setSession(null, data.data.user);
-      return data.data.user;
-    }
-    return null;
+  refreshProfile(): Observable<User | null> {
+    return this.http.get<ApiResponse<{ user: User }>>(`${API_BASE}/auth/profile`).pipe(
+      tap(data => {
+        if (data.status === 'success' && data.data) {
+          this.setSession(null, data.data.user);
+        }
+      }),
+      map(data => data.status === 'success' && data.data ? data.data.user : null) 
+    );
   }
 
-  async updateProfile(formData: FormData): Promise<ApiResponse<{ user: User }>> {
-    const data = await firstValueFrom(
-      this.http.patch<ApiResponse<{ user: User }>>(`${API_BASE}/auth/profile`, formData)
+  updateProfile(formData: FormData): Observable<ApiResponse<{ user: User }>> {
+    return this.http.patch<ApiResponse<{ user: User }>>(`${API_BASE}/auth/profile`, formData).pipe(
+      tap(data => {
+        if (data.status === 'success' && data.data) {
+          this.setSession(null, data.data.user);
+        }
+      })
     );
-    if (data.status === 'success' && data.data) {
-      this.setSession(null, data.data.user);
-    }
-    return data;
   }
 
-  async enroll(courseId: string): Promise<ApiResponse<{ user: User }>> {
-    return firstValueFrom(
-      this.http.post<ApiResponse<{ user: User }>>(`${API_BASE}/auth/enroll`, { courseId })
-    );
+  enroll(courseId: string): Observable<ApiResponse<{ user: User }>> {
+    return this.http.post<ApiResponse<{ user: User }>>(`${API_BASE}/auth/enroll`, { courseId });
   }
 
   /* ---- admin-only user management ---- */
-  async getAllUsers(): Promise<ApiResponse<{ users: User[] }>> {
-    return firstValueFrom(this.http.get<ApiResponse<{ users: User[] }>>(`${API_BASE}/auth/users`));
+  getAllUsers(): Observable<ApiResponse<{ users: User[] }>> {
+    return this.http.get<ApiResponse<{ users: User[] }>>(`${API_BASE}/auth/users`);
   }
 
-  async toggleUserRole(id: string): Promise<ApiResponse<{ user: User }>> {
-    return firstValueFrom(this.http.patch<ApiResponse<{ user: User }>>(`${API_BASE}/auth/users/${id}/role`, {}));
+  toggleUserRole(id: string): Observable<ApiResponse<{ user: User }>> {
+    return this.http.patch<ApiResponse<{ user: User }>>(`${API_BASE}/auth/users/${id}/role`, {});
   }
 
-  async deleteUser(id: string): Promise<ApiResponse> {
-    return firstValueFrom(this.http.delete<ApiResponse>(`${API_BASE}/auth/users/${id}`));
+  deleteUser(id: string): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${API_BASE}/auth/users/${id}`);
   }
 }
