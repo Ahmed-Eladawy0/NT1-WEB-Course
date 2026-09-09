@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap, map } from 'rxjs'; 
 import { API_BASE } from '../utils';
 import { ApiResponse, User } from '../models/models';
+import { jwtDecode } from 'jwt-decode'; 
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -23,7 +24,26 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.token() && !!this.user();
+    const currentToken = this.token();
+    
+    if (!currentToken) {
+      return false;
+    }
+
+    try {
+      const decoded = jwtDecode<any>(currentToken);
+      const expirationDate = new Date(decoded.exp * 1000);
+
+      if (expirationDate < new Date()) {
+        this.clearSession(); 
+        return false;
+      }
+
+      return !!this.user();
+    } catch {
+      this.clearSession(); 
+      return false;
+    }
   }
 
   isAdmin(): boolean {

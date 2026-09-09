@@ -209,8 +209,9 @@ export class AdminDashboard implements OnInit {
       next: (data) => {
         if (data.status === 'success') {
           this.toast.success('Course deleted');
-          this.fetchCourses();
-        } else {
+          this.coursesCache.update((courses) => courses.filter((course) => course._id !== c._id)); 
+        } 
+        else {
           this.toast.error(data.message || 'Failed to delete');
         }
       },
