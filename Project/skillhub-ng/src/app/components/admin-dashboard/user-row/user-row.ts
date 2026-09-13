@@ -1,5 +1,5 @@
 import { Component, input, output, inject } from '@angular/core';
-import { User } from '../../../core/models/models';
+import { User, Course, PaymentRecord } from '../../../core/models/models';
 import { fullName, uploadedFileUrl } from '../../../core/utils';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -24,6 +24,25 @@ export class UserRowComponent {
   }
   get enrolledCount(): number {
     return this.user().myCourses?.length ?? 0;
+  }
+  
+  get enrolledCourses(): Course[] {
+    const courses = this.user().myCourses;
+    if (!courses) return [];
+    // Only return fully populated Course objects that are not null/undefined
+    return courses.filter(c => c && typeof c !== 'string') as Course[];
+  }
+  
+  get enrolledData(): { course: Course, payment?: PaymentRecord }[] {
+    const courses = this.enrolledCourses;
+    const payments = this.user().payments || [];
+    
+    return courses.map(course => {
+      const payment = payments.find(p => 
+        (typeof p.courseId === 'string' ? p.courseId : (p.courseId as Course)._id) === course._id
+      );
+      return { course, payment };
+    });
   }
   get isSelf(): boolean {
     return this.user()._id === this.auth.user()?._id;

@@ -1,0 +1,410 @@
+/* ============================================================
+   Payment Modal — Premium Egyptian checkout flow
+   ============================================================ */
+
+.payment-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 12, 8, 0.65);
+  z-index: 170;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: pay-fade-in 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+@keyframes pay-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.payment-modal {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 32px 80px -16px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  max-height: 95vh;
+  overflow: hidden;
+  animation: pay-scale-in 0.26s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes pay-scale-in {
+  from { transform: scale(0.92) translateY(16px); opacity: 0; }
+  to   { transform: scale(1)    translateY(0);    opacity: 1; }
+}
+
+/* ---- Header ---- */
+.payment-header {
+  background: linear-gradient(135deg, var(--brand) 0%, #1a5c38 100%);
+  padding: 20px 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+  flex-shrink: 0;
+}
+.payment-lock-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.payment-lock-icon svg { color: #fff; }
+.payment-header-text { flex: 1; }
+.payment-header-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 3px;
+}
+.payment-course-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  font-family: var(--font-display);
+}
+.payment-price-badge {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 8px;
+  white-space: nowrap;
+  align-self: center;
+  flex-shrink: 0;
+}
+.payment-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  transition: background 0.15s ease;
+}
+.payment-close:hover { background: rgba(255,255,255,0.28); }
+
+/* ---- Scrollable body ---- */
+.payment-body {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+/* ---- Method Selector Tabs ---- */
+.pay-methods {
+  display: flex;
+  gap: 0;
+  padding: 16px 20px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.pay-methods::-webkit-scrollbar { display: none; }
+.pay-method-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 14px 12px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+  color: var(--ink-soft);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  position: relative;
+  bottom: -1px;
+}
+.pay-method-btn:hover { color: var(--ink); }
+.pay-method-btn.active { color: var(--brand); border-bottom-color: var(--brand); }
+.pay-method-btn .method-icon {
+  font-size: 20px;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+/* ---- Method Content ---- */
+.pay-content { padding: 20px; }
+
+/* ---- Card Visual ---- */
+.card-visual {
+  width: 100%;
+  aspect-ratio: 1.586;
+  border-radius: 16px;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  transition: background 0.4s ease;
+}
+.card-visual.visa    { background: linear-gradient(135deg, #0d3b91 0%, #1a52c2 100%); }
+.card-visual.mastercard { background: linear-gradient(135deg, #1a0a00 0%, #6b1a00 100%); }
+.card-visual.amex    { background: linear-gradient(135deg, #003d1a 0%, #006b2c 100%); }
+.card-visual.meeza   { background: linear-gradient(135deg, #2d0057 0%, #5a00a0 100%); }
+
+.card-visual::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+.card-visual::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+
+.card-top { display: flex; align-items: center; justify-content: space-between; }
+.card-chip {
+  width: 36px;
+  height: 28px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #d4a017, #f0c94d, #b8860b);
+}
+.card-network {
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.card-network.visa-logo    { font-style: italic; font-size: 22px; letter-spacing: -0.03em; }
+.card-network.mc-logo      { display: flex; gap: 0; }
+.card-mc-circle { width: 26px; height: 26px; border-radius: 50%; opacity: 0.9; }
+.card-mc-circle:first-child { background: #eb001b; }
+.card-mc-circle:last-child  { background: #f79e1b; margin-left: -10px; }
+
+.card-number {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.9);
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.card-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.card-holder-label, .card-expiry-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 2px;
+}
+.card-holder-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card-expiry-value {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.1em;
+}
+
+/* ---- Card Form ---- */
+.card-form { display: flex; flex-direction: column; gap: 12px; }
+.card-form .pay-field { display: flex; flex-direction: column; gap: 5px; }
+.card-form .pay-field label { font-size: 12px; font-weight: 600; color: var(--ink-soft); letter-spacing: 0.01em; }
+.card-form .pay-input {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--canvas); color: var(--ink); font-size: 14.5px;
+  font-family: var(--font-mono);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.card-form .pay-input:focus {
+  outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft);
+}
+.card-form .pay-input::placeholder { font-family: var(--font-body); color: var(--border-strong); }
+.card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ---- Instapay QR ---- */
+.instapay-content { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 8px 0; }
+.instapay-qr-wrap {
+  width: 170px;
+  height: 170px;
+  border-radius: 14px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  padding: 12px;
+}
+.instapay-logo {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+}
+.instapay-instructions {
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  max-width: 300px;
+}
+.instapay-amount {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* ---- Wallet (Vodafone / Etisalat) ---- */
+.wallet-content { display: flex; flex-direction: column; gap: 16px; }
+.wallet-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+.wallet-logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.wallet-logo.voda { background: #e60026; }
+.wallet-logo.etis { background: #00a8e0; }
+.wallet-info-text { font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+.wallet-merchant { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--ink); }
+.wallet-pay-field { display: flex; flex-direction: column; gap: 6px; }
+.wallet-pay-field label { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); }
+.wallet-pay-field .pay-input {
+  padding: 11px 14px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--canvas); color: var(--ink); font-size: 14.5px;
+  font-family: var(--font-mono);
+  width: 100%;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.wallet-pay-field .pay-input:focus {
+  outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+/* ---- Apple Pay ---- */
+.apple-content { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 12px 0; }
+.apple-pay-icon { font-size: 48px; }
+.apple-pay-text { font-size: 14px; color: var(--ink-soft); text-align: center; line-height: 1.55; max-width: 280px; }
+.apple-pay-amount { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--ink); }
+
+/* ---- Footer ---- */
+.payment-footer {
+  flex-shrink: 0;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.pay-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.pay-btn-card {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(32, 64, 45, 0.35);
+}
+.pay-btn-card:not(:disabled):hover {
+  background: var(--brand-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(32, 64, 45, 0.4);
+}
+.pay-btn-apple {
+  background: #000;
+  color: #fff;
+}
+.pay-btn-apple:not(:disabled):hover { background: #222; }
+.pay-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important; }
+.pay-btn .spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.pay-secure-note {
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+@media (max-width: 500px) {
+  .payment-modal { border-radius: 16px 16px 0 0; align-self: flex-end; max-height: 92vh; }
+  .payment-overlay { align-items: flex-end; padding: 0; }
+  .card-number { font-size: 15px; letter-spacing: 0.14em; }
+}

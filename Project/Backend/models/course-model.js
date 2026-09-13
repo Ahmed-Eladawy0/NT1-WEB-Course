@@ -37,6 +37,25 @@ const courseSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    description: {
+      type: String,
+    },
+    whatYouWillLearn: {
+      type: [String],
+      default: [],
+    },
+    requirements: {
+      type: [String],
+      default: [],
+    },
+    tools: {
+      type: [String],
+      default: [],
+    },
+    videoUrl: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true,

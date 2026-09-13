@@ -61,6 +61,18 @@ const userSchema = new mongoose.Schema(
       ],
       default: [],
     },
+    payments: {
+      type: [
+        {
+          courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+          method: { type: String, enum: ['card', 'instapay', 'vodafone', 'etisalat', 'apple'] },
+          status: { type: String, default: 'completed' },
+          amount: { type: Number },
+          date: { type: Date, default: Date.now }
+        }
+      ],
+      default: [],
+    },
   },
   {
     timestamps: true,

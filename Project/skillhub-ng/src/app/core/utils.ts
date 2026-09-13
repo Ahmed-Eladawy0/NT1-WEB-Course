@@ -21,6 +21,7 @@ export function initials(name = ''): string {
 /** Build the real URL to an uploaded file, or null if there isn't a real one. */
 export function uploadedFileUrl(folder: 'users' | 'courses', filename?: string | null): string | null {
   if (!filename || filename === 'default-user.webp') return null;
+  if (filename.startsWith('http')) return filename;
   return `${SERVER_ORIGIN}/uploads/${folder}/${filename}`;
 }
 

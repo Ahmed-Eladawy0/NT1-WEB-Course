@@ -51,11 +51,20 @@ const createCourse = async (req, res) => {
     const category = req.body.category?.toLowerCase();
     const level = req.body.level?.toLowerCase();
 
+    // Parse array fields sent as JSON strings via FormData
+    const parseArrayField = (val) => {
+      if (!val) return [];
+      try { return JSON.parse(val); } catch (e) { return []; }
+    };
+
     const newCourse = await Course.create({
       ...req.body,
       category,
       level,
       imageUrl: req.file?.filename,
+      whatYouWillLearn: parseArrayField(req.body.whatYouWillLearn),
+      requirements: parseArrayField(req.body.requirements),
+      tools: parseArrayField(req.body.tools),
     });
 
     res.status(201).json({
@@ -94,6 +103,15 @@ const updateCourse = async (req, res) => {
     if (req.body.level) {
       req.body.level = req.body.level.toLowerCase();
     }
+
+    // Parse array fields sent as JSON strings via FormData
+    const parseArrayField = (val) => {
+      try { return JSON.parse(val); } catch (e) { return []; }
+    };
+
+    if (req.body.whatYouWillLearn) req.body.whatYouWillLearn = parseArrayField(req.body.whatYouWillLearn);
+    if (req.body.requirements) req.body.requirements = parseArrayField(req.body.requirements);
+    if (req.body.tools) req.body.tools = parseArrayField(req.body.tools);
 
     if (req.file) {
       req.body.imageUrl = req.file.filename;

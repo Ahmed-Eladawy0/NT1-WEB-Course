@@ -2,6 +2,9 @@ import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms'; 
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Header } from '../../shared/header/header';
+import { CourseDetailComponent } from './course-detail/course-detail';
+import { PaymentModalComponent } from './payment-modal/payment-modal';
+import { ConfirmService } from '../../core/services/confirm.service';
 import { AuthService } from '../../core/services/auth.service';
 import { CourseService } from '../../core/services/course.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -18,7 +21,7 @@ import {
 @Component({
   selector: 'app-user-dashboard',
   standalone: true,
-  imports: [FormsModule, Header],
+  imports: [FormsModule, Header, CourseDetailComponent, PaymentModalComponent],
   templateUrl: './user-dashboard.html',
   styleUrl: './user-dashboard.css',
 })
@@ -27,13 +30,21 @@ export class UserDashboard implements OnInit {
   private courseService = inject(CourseService);
   private toast = inject(ToastService);
   private sanitizer = inject(DomSanitizer);
+  private confirm = inject(ConfirmService);
 
   loading = signal(true);
   allCourses = signal<Course[]>([]);
   categories = signal<string[]>([]);
   
-  enrolledIds = signal<Set<string>>(new Set());
-  enrollingIds = signal<Set<string>>(new Set());
+  enrolledIds    = signal<Set<string>>(new Set());
+  enrollingIds   = signal<Set<string>>(new Set());
+  unenrollingIds = signal<Set<string>>(new Set());
+
+  /** The course whose detail panel is currently open (null = closed). */
+  selectedCourse = signal<Course | null>(null);
+
+  /** The course waiting for payment confirmation (null = modal closed). */
+  pendingEnrollCourse = signal<Course | null>(null);
 
   searchTitle = signal('');
   filterCategory = signal('');
@@ -98,6 +109,14 @@ export class UserDashboard implements OnInit {
     this.maxPrice.set(null);
   }
 
+  openDetail(course: Course): void {
+    this.selectedCourse.set(course);
+  }
+
+  closeDetail(): void {
+    this.selectedCourse.set(null);
+  }
+
   isEnrolled(course: Course): boolean {
     return this.enrolledIds().has(course._id);
   }
@@ -106,36 +125,80 @@ export class UserDashboard implements OnInit {
     return this.enrollingIds().has(course._id);
   }
 
-  enroll(course: Course): void {
+  /** Open the payment modal (intercepts both card + detail-panel enroll clicks). */
+  openPayment(course: Course): void {
+    this.pendingEnrollCourse.set(course);
+  }
+
+  /** Called by the payment modal on confirm — runs the actual API enroll. */
+  executeEnroll(payload: { course: Course, method: string }): void {
+    const { course, method } = payload;
+    this.pendingEnrollCourse.set(null); // close payment modal
+
     const currentEnrolling = new Set(this.enrollingIds());
     currentEnrolling.add(course._id);
     this.enrollingIds.set(currentEnrolling);
 
-    this.auth.enroll(course._id).subscribe({
+    this.auth.enroll(course._id, method, course.price).subscribe({
       next: (data) => {
         if (data.status === 'success') {
           const currentEnrolled = new Set(this.enrolledIds());
           currentEnrolled.add(course._id);
           this.enrolledIds.set(currentEnrolled);
-          
-          this.toast.success(`Enrolled in "${course.title}"`);
+          this.toast.success(`🎉 Enrolled in "${course.title}"!`);
         } else {
           this.toast.error(data.message || 'Failed to enroll');
         }
         this.removeEnrolling(course._id);
       },
       error: (err) => {
-        console.error('Error enrolling course:', err);
+        console.error('Error enrolling:', err);
         this.toast.error(err.message || 'Could not reach the server.');
         this.removeEnrolling(course._id);
       }
     });
   }
 
+  /** Unenroll with confirmation. */
+  async unenroll(course: Course): Promise<void> {
+    const ok = await this.confirm.ask({
+      title: 'Unenroll from course?',
+      message: `You will lose access to "${course.title}". You can re-enroll anytime.`,
+      confirmLabel: 'Yes, unenroll',
+      danger: true
+    });
+    if (!ok) return;
+
+    const currentUnenrolling = new Set(this.unenrollingIds());
+    currentUnenrolling.add(course._id);
+    this.unenrollingIds.set(currentUnenrolling);
+
+    this.auth.unenroll(course._id).subscribe({
+      next: (data) => {
+        if (data.status === 'success') {
+          const currentEnrolled = new Set(this.enrolledIds());
+          currentEnrolled.delete(course._id);
+          this.enrolledIds.set(currentEnrolled);
+          this.toast.success(`Unenrolled from "${course.title}"`);
+        } else {
+          this.toast.error(data.message || 'Failed to unenroll');
+        }
+        this.removeUnenrolling(course._id);
+      },
+      error: (err) => {
+        console.error('Error unenrolling:', err);
+        this.toast.error('Could not unenroll — please try again.');
+        this.removeUnenrolling(course._id);
+      }
+    });
+  }
+
   private removeEnrolling(courseId: string): void {
-    const updatedEnrolling = new Set(this.enrollingIds());
-    updatedEnrolling.delete(courseId);
-    this.enrollingIds.set(updatedEnrolling);
+    const s = new Set(this.enrollingIds()); s.delete(courseId); this.enrollingIds.set(s);
+  }
+
+  private removeUnenrolling(courseId: string): void {
+    const s = new Set(this.unenrollingIds()); s.delete(courseId); this.unenrollingIds.set(s);
   }
 
   /* ---- display helpers ---- */

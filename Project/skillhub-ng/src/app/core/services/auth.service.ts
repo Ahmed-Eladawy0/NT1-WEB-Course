@@ -122,8 +122,12 @@ export class AuthService {
     );
   }
 
-  enroll(courseId: string): Observable<ApiResponse<{ user: User }>> {
-    return this.http.post<ApiResponse<{ user: User }>>(`${API_BASE}/auth/enroll`, { courseId });
+  enroll(courseId: string, paymentMethod: string, amount: number): Observable<ApiResponse<{ user: User }>> {
+    return this.http.post<ApiResponse<{ user: User }>>(`${API_BASE}/auth/enroll`, { courseId, paymentMethod, amount });
+  }
+
+  unenroll(courseId: string): Observable<ApiResponse<{ user: User }>> {
+    return this.http.delete<ApiResponse<{ user: User }>>(`${API_BASE}/auth/enroll/${courseId}`);
   }
 
   /* ---- admin-only user management ---- */

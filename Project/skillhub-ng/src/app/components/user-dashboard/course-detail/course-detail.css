@@ -1,0 +1,281 @@
+/* ============================================================
+   Course Detail Panel — Slide-in overlay
+   ============================================================ */
+
+.detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 18, 12, 0.6);
+  z-index: 160;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  animation: overlay-in 0.22s ease;
+  backdrop-filter: blur(3px);
+}
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Panel */
+.detail-panel {
+  width: 100%;
+  max-width: 560px;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: panel-slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes panel-slide-in {
+  from { transform: translateX(100%); opacity: 0.6; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* Scrollable body */
+.detail-body {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+/* Hero cover at top of panel */
+.detail-cover {
+  height: 200px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+.detail-cover svg {
+  width: 52px;
+  height: 52px;
+  opacity: 0.45;
+}
+.detail-cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(20,18,12,0) 40%, rgba(20,18,12,0.55) 100%);
+}
+.detail-cover-title {
+  position: absolute;
+  bottom: 16px;
+  left: 22px;
+  right: 22px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  line-height: 1.25;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+/* Close button */
+.detail-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(6px);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: background 0.15s ease;
+  z-index: 2;
+}
+.detail-close:hover { background: rgba(255,255,255,0.32); }
+
+/* Content padding */
+.detail-content {
+  padding: 22px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Meta row */
+.detail-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.detail-instructor {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+.detail-instructor strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Section */
+.detail-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+.detail-description {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+/* Video section */
+.detail-video-wrap {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #000;
+  aspect-ratio: 16/9;
+  position: relative;
+}
+.detail-video-wrap iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+.detail-video-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--ink-soft);
+  font-size: 13.5px;
+}
+.detail-video-placeholder svg {
+  opacity: 0.4;
+}
+
+/* Bullet lists */
+.detail-bullet-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.detail-bullet-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.bullet-icon {
+  flex-shrink: 0;
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  color: var(--brand);
+}
+
+/* Tools tags */
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.detail-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font-family: var(--font-mono);
+}
+.detail-tag svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0.6;
+}
+
+/* Sticky footer with price + enroll */
+.detail-footer {
+  flex-shrink: 0;
+  padding: 16px 26px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.detail-price-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.detail-price-label {
+  font-size: 11px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.detail-price {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.detail-enroll-btn {
+  min-width: 150px;
+}
+.detail-enrolled-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green);
+  background: var(--green-soft);
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+}
+
+/* Divider */
+.detail-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+/* Mobile full-screen */
+@media (max-width: 580px) {
+  .detail-panel {
+    max-width: 100%;
+    border-left: none;
+  }
+}

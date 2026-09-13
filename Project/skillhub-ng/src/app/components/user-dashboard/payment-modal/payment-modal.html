@@ -1,0 +1,266 @@
+@if (courseData()) {
+<div class="payment-overlay" (click)="onOverlayClick($event)">
+<div class="payment-modal">
+
+  <!-- ========== HEADER ========== -->
+  <div class="payment-header">
+    <div class="payment-lock-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <div class="payment-header-text">
+      <div class="payment-header-label">🔒 Secure Checkout</div>
+      <div class="payment-course-name">{{ courseData()!.title }}</div>
+    </div>
+    <div class="payment-price-badge">EGP {{ courseData()!.price }}</div>
+    <button class="payment-close" (click)="cancelled.emit()" [disabled]="processing()" aria-label="Close">×</button>
+  </div>
+
+  <!-- ========== METHOD TABS ========== -->
+  <div class="pay-methods">
+    <button class="pay-method-btn" [class.active]="selectedMethod()==='card'" (click)="selectMethod('card')">
+      <span class="method-icon">💳</span> Card
+    </button>
+    <button class="pay-method-btn" [class.active]="selectedMethod()==='instapay'" (click)="selectMethod('instapay')">
+      <span class="method-icon">📲</span> Instapay
+    </button>
+    <button class="pay-method-btn" [class.active]="selectedMethod()==='vodafone'" (click)="selectMethod('vodafone')">
+      <span class="method-icon">🔴</span> Vodafone Cash
+    </button>
+    <button class="pay-method-btn" [class.active]="selectedMethod()==='etisalat'" (click)="selectMethod('etisalat')">
+      <span class="method-icon">🔵</span> Etisalat Cash
+    </button>
+    <button class="pay-method-btn" [class.active]="selectedMethod()==='apple'" (click)="selectMethod('apple')">
+      <span class="method-icon">🍎</span> Apple Pay
+    </button>
+  </div>
+
+  <!-- ========== SCROLLABLE BODY ========== -->
+  <div class="payment-body">
+    <div class="pay-content">
+
+      <!-- ── CARD ── -->
+      @if (selectedMethod() === 'card') {
+
+        <!-- Live card visual -->
+        <div class="card-visual" [class.visa]="cardNetworkLogo()==='visa'"
+             [class.mastercard]="cardNetworkLogo()==='mastercard'"
+             [class.amex]="cardNetworkLogo()==='amex'"
+             [class.meeza]="cardNetworkLogo()==='meeza'">
+          <div class="card-top">
+            <div class="card-chip"></div>
+            @if (cardNetworkLogo() === 'visa') {
+              <span class="card-network visa-logo">VISA</span>
+            } @else if (cardNetworkLogo() === 'mastercard') {
+              <span class="card-network mc-logo">
+                <span class="card-mc-circle"></span>
+                <span class="card-mc-circle"></span>
+              </span>
+            } @else if (cardNetworkLogo() === 'amex') {
+              <span class="card-network" style="font-size:13px;">AMEX</span>
+            } @else if (cardNetworkLogo() === 'meeza') {
+              <span class="card-network" style="font-size:13px; color:#f0d060;">Meeza</span>
+            } @else {
+              <span class="card-network" style="opacity:.4; font-size:11px;">CARD</span>
+            }
+          </div>
+
+          <div class="card-number">{{ maskedNumber() }}</div>
+
+          <div class="card-bottom">
+            <div>
+              <div class="card-holder-label">Card Holder</div>
+              <div class="card-holder-name">{{ cardName() || 'YOUR NAME' }}</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="card-expiry-label">Expires</div>
+              <div class="card-expiry-value">{{ cardExpiry() || 'MM/YY' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card form -->
+        <div class="card-form">
+          <div class="pay-field">
+            <label>Card Number</label>
+            <input class="pay-input" type="text" inputmode="numeric" maxlength="19"
+                   placeholder="0000  0000  0000  0000"
+                   [value]="cardNumber()"
+                   (input)="onCardNumberInput($event)">
+          </div>
+          <div class="pay-field">
+            <label>Cardholder Name</label>
+            <input class="pay-input" type="text" placeholder="As printed on card"
+                   [value]="cardName()"
+                   (input)="cardName.set($any($event.target).value)">
+          </div>
+          <div class="card-row">
+            <div class="pay-field">
+              <label>Expiry Date</label>
+              <input class="pay-input" type="text" inputmode="numeric" maxlength="5"
+                     placeholder="MM/YY"
+                     [value]="cardExpiry()"
+                     (input)="onExpiryInput($event)">
+            </div>
+            <div class="pay-field">
+              <label>CVV</label>
+              <input class="pay-input" type="password" inputmode="numeric" maxlength="4"
+                     placeholder="•••"
+                     [value]="cardCvv()"
+                     (input)="onCvvInput($event)">
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ── INSTAPAY ── -->
+      @if (selectedMethod() === 'instapay') {
+        <div class="instapay-content">
+          <div class="instapay-amount">EGP {{ courseData()!.price }}</div>
+          <div class="instapay-qr-wrap">
+            <svg viewBox="0 0 100 100" width="146" height="146" fill="#111">
+              <!-- Corner squares -->
+              <rect x="5" y="5" width="28" height="28" rx="3" fill="none" stroke="#111" stroke-width="3"/>
+              <rect x="11" y="11" width="16" height="16" rx="1"/>
+              <rect x="67" y="5" width="28" height="28" rx="3" fill="none" stroke="#111" stroke-width="3"/>
+              <rect x="73" y="11" width="16" height="16" rx="1"/>
+              <rect x="5" y="67" width="28" height="28" rx="3" fill="none" stroke="#111" stroke-width="3"/>
+              <rect x="11" y="73" width="16" height="16" rx="1"/>
+              <!-- Data dots -->
+              <rect x="40" y="5"  width="4" height="4"/><rect x="48" y="5"  width="4" height="4"/>
+              <rect x="56" y="5"  width="4" height="4"/><rect x="40" y="13" width="4" height="4"/>
+              <rect x="56" y="13" width="4" height="4"/><rect x="48" y="21" width="4" height="4"/>
+              <rect x="5"  y="40" width="4" height="4"/><rect x="13" y="40" width="4" height="4"/>
+              <rect x="5"  y="48" width="4" height="4"/><rect x="21" y="48" width="4" height="4"/>
+              <rect x="5"  y="56" width="4" height="4"/><rect x="13" y="56" width="4" height="4"/>
+              <rect x="40" y="40" width="4" height="4"/><rect x="48" y="40" width="4" height="4"/>
+              <rect x="56" y="40" width="4" height="4"/><rect x="64" y="40" width="4" height="4"/>
+              <rect x="40" y="48" width="4" height="4"/><rect x="56" y="48" width="4" height="4"/>
+              <rect x="48" y="56" width="4" height="4"/><rect x="64" y="56" width="4" height="4"/>
+              <rect x="40" y="64" width="4" height="4"/><rect x="48" y="64" width="4" height="4"/>
+              <rect x="56" y="72" width="4" height="4"/><rect x="64" y="64" width="4" height="4"/>
+              <rect x="40" y="80" width="4" height="4"/><rect x="48" y="80" width="4" height="4"/>
+              <rect x="40" y="88" width="4" height="4"/><rect x="56" y="88" width="4" height="4"/>
+              <rect x="67" y="40" width="4" height="4"/><rect x="75" y="40" width="4" height="4"/>
+              <rect x="83" y="40" width="4" height="4"/><rect x="91" y="40" width="4" height="4"/>
+              <rect x="67" y="48" width="4" height="4"/><rect x="83" y="48" width="4" height="4"/>
+              <rect x="75" y="56" width="4" height="4"/><rect x="91" y="56" width="4" height="4"/>
+            </svg>
+          </div>
+          <div class="instapay-logo">Instapay QR Code</div>
+          <div class="instapay-instructions">
+            Open your <strong>Instapay</strong> app, tap <em>Scan & Pay</em>, and scan this code
+            to transfer <strong>EGP {{ courseData()!.price }}</strong> and complete your enrollment.
+          </div>
+          <div style="font-size:12.5px; color:var(--ink-soft); text-align:center;">
+            Or send to merchant phone: <span style="font-family:var(--font-mono); font-weight:700; color:var(--ink);">010 1234 5678</span>
+          </div>
+        </div>
+      }
+
+      <!-- ── VODAFONE CASH ── -->
+      @if (selectedMethod() === 'vodafone') {
+        <div class="wallet-content">
+          <div class="wallet-header">
+            <div class="wallet-logo voda">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="white"/>
+                <circle cx="12" cy="12" r="3" fill="white"/>
+              </svg>
+            </div>
+            <div>
+              <div style="font-weight:700; font-size:14px;">Vodafone Cash</div>
+              <div class="wallet-info-text">Transfer to merchant number</div>
+              <div class="wallet-merchant">010 9876 5432</div>
+            </div>
+          </div>
+          <div style="font-size:13px; color:var(--ink-soft); line-height:1.6; padding:4px 0;">
+            Send <strong style="color:var(--ink);">EGP {{ courseData()!.price }}</strong> to the number above from your Vodafone Cash wallet,
+            then enter your registered phone number below to confirm.
+          </div>
+          <div class="wallet-pay-field">
+            <label>Your Vodafone Number</label>
+            <input class="pay-input" type="tel" inputmode="numeric" maxlength="11"
+                   placeholder="01X XXXX XXXX"
+                   [value]="phone()"
+                   (input)="phone.set($any($event.target).value)">
+          </div>
+        </div>
+      }
+
+      <!-- ── ETISALAT CASH ── -->
+      @if (selectedMethod() === 'etisalat') {
+        <div class="wallet-content">
+          <div class="wallet-header">
+            <div class="wallet-logo etis">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                <path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L20 8v8l-8 4-8-4V8l8-3.82z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </div>
+            <div>
+              <div style="font-weight:700; font-size:14px;">Etisalat Cash (e-Finance)</div>
+              <div class="wallet-info-text">Transfer to merchant number</div>
+              <div class="wallet-merchant">011 2345 6789</div>
+            </div>
+          </div>
+          <div style="font-size:13px; color:var(--ink-soft); line-height:1.6; padding:4px 0;">
+            Send <strong style="color:var(--ink);">EGP {{ courseData()!.price }}</strong> to the number above from your Etisalat Cash app,
+            then enter your registered number below to confirm.
+          </div>
+          <div class="wallet-pay-field">
+            <label>Your Etisalat Number</label>
+            <input class="pay-input" type="tel" inputmode="numeric" maxlength="11"
+                   placeholder="011 XXXX XXXX"
+                   [value]="phone()"
+                   (input)="phone.set($any($event.target).value)">
+          </div>
+        </div>
+      }
+
+      <!-- ── APPLE PAY ── -->
+      @if (selectedMethod() === 'apple') {
+        <div class="apple-content">
+          <div class="apple-pay-icon">🍎</div>
+          <div class="apple-pay-amount">EGP {{ courseData()!.price }}</div>
+          <div class="apple-pay-text">
+            Confirm with <strong>Face ID</strong>, <strong>Touch ID</strong>, or your <strong>Apple Watch</strong>
+            to complete this payment securely using Apple Pay.
+          </div>
+        </div>
+      }
+
+    </div><!-- /pay-content -->
+  </div><!-- /payment-body -->
+
+  <!-- ========== FOOTER / PAY BUTTON ========== -->
+  <div class="payment-footer">
+    <button class="pay-btn"
+            [class.pay-btn-card]="selectedMethod() !== 'apple'"
+            [class.pay-btn-apple]="selectedMethod() === 'apple'"
+            [disabled]="!isValid() || processing()"
+            (click)="onConfirm()">
+      @if (processing()) {
+        <span class="spinner"></span>
+        Processing…
+      } @else if (selectedMethod() === 'apple') {
+         Pay with Apple Pay
+      } @else {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+        Pay EGP {{ courseData()!.price }}
+      }
+    </button>
+    <div class="pay-secure-note">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      256-bit SSL encrypted · Your data is safe
+    </div>
+  </div>
+
+</div><!-- /payment-modal -->
+</div><!-- /payment-overlay -->
+}

@@ -7,6 +7,7 @@ const {
   updateUserRole,
   deleteUser,
   enrollCourse,
+  unenrollCourse,
   updateProfile,
   getUserProfile
 } = require("../controllers/auth-controller");
@@ -24,6 +25,7 @@ router.use(authenticateMiddleware);
 router.get("/profile", getUserProfile);
 router.patch("/profile", multerUpload.single("imageUrl"), updateProfile);
 router.post("/enroll", enrollCourse);
+router.delete("/enroll/:courseId", unenrollCourse);
 
 // 3. Admin Only Routes
 router.use(authorizeMiddleware("admin"));

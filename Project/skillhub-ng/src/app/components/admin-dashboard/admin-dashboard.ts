@@ -71,18 +71,43 @@ export class AdminDashboard implements OnInit {
   coverPreviewUrl: string | null = null;
 
   courseForm = new FormGroup({
-    title: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]),
-    instructor: new FormControl('', [Validators.required]),
-    category: new FormControl('', [Validators.required]),
-    price: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
-    level: new FormControl('', [Validators.required]),
-    duration: new FormControl('', [Validators.required])
+    title:       new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]),
+    instructor:  new FormControl('', [Validators.required]),
+    category:    new FormControl('', [Validators.required]),
+    price:       new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
+    level:       new FormControl('', [Validators.required]),
+    duration:    new FormControl('', [Validators.required]),
+    description: new FormControl(''),
+    videoUrl:    new FormControl('')
   });
 
   togglingRoleId: string | null = null;
   deletingUserId: string | null = null;
   capitalize = capitalizeWords;
   fullName = fullName;
+
+  /* ---- rich-content tag state ---- */
+  whatYouWillLearnItems: string[] = [];
+  requirementsItems:     string[] = [];
+  toolsItems:            string[] = [];
+
+  addTagItem(input: HTMLInputElement, target: 'learn' | 'req' | 'tools'): void {
+    const val = input.value.trim();
+    if (!val) return;
+    if (target === 'learn' && !this.whatYouWillLearnItems.includes(val))
+      this.whatYouWillLearnItems = [...this.whatYouWillLearnItems, val];
+    else if (target === 'req' && !this.requirementsItems.includes(val))
+      this.requirementsItems = [...this.requirementsItems, val];
+    else if (target === 'tools' && !this.toolsItems.includes(val))
+      this.toolsItems = [...this.toolsItems, val];
+    input.value = '';
+  }
+
+  removeTagItem(index: number, target: 'learn' | 'req' | 'tools'): void {
+    if (target === 'learn')  this.whatYouWillLearnItems = this.whatYouWillLearnItems.filter((_, i) => i !== index);
+    else if (target === 'req')   this.requirementsItems = this.requirementsItems.filter((_, i) => i !== index);
+    else if (target === 'tools') this.toolsItems        = this.toolsItems.filter((_, i) => i !== index);
+  }
 
   get currentUserId(): string | undefined {
     return this.auth.user()?._id;
@@ -149,6 +174,12 @@ export class AdminDashboard implements OnInit {
     fd.append('level', formValues.level || '');
     fd.append('duration', formValues.duration || '');
     if (this.coverFile) fd.append('imageUrl', this.coverFile);
+    // Optional rich-detail fields
+    fd.append('description', formValues.description || '');
+    fd.append('videoUrl',    formValues.videoUrl    || '');
+    if (this.whatYouWillLearnItems.length) fd.append('whatYouWillLearn', JSON.stringify(this.whatYouWillLearnItems));
+    if (this.requirementsItems.length)     fd.append('requirements',     JSON.stringify(this.requirementsItems));
+    if (this.toolsItems.length)            fd.append('tools',            JSON.stringify(this.toolsItems));
 
     const request$ = this.isEditing 
       ? this.courseService.update(this.courseId, fd)
@@ -178,13 +209,19 @@ export class AdminDashboard implements OnInit {
     this.coverFile = null;
     this.courseId = c._id;
     this.coverPreviewUrl = uploadedFileUrl('courses', c.imageUrl);
+    // Populate tag arrays from existing course data
+    this.whatYouWillLearnItems = Array.isArray(c.whatYouWillLearn) ? [...c.whatYouWillLearn] : [];
+    this.requirementsItems     = Array.isArray(c.requirements)     ? [...c.requirements]     : [];
+    this.toolsItems            = Array.isArray(c.tools)            ? [...c.tools]            : [];
     this.courseForm.patchValue({
-      title: c.title,
-      instructor: c.instructor,
-      category: c.category, 
-      price: c.price,
-      level: c.level,
-      duration: c.duration || ''
+      title:       c.title,
+      instructor:  c.instructor,
+      category:    c.category,
+      price:       c.price,
+      level:       c.level,
+      duration:    c.duration    || '',
+      description: c.description || '',
+      videoUrl:    c.videoUrl    || ''
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -194,6 +231,9 @@ export class AdminDashboard implements OnInit {
     this.coverFile = null;
     this.coverPreviewUrl = null;
     this.courseId = '';
+    this.whatYouWillLearnItems = [];
+    this.requirementsItems     = [];
+    this.toolsItems            = [];
     this.courseForm.reset();
   }
 

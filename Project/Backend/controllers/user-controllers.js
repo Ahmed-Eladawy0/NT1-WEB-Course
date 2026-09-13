@@ -2,7 +2,7 @@ const User = require('../models/user-model');
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}, '-password');
+    const users = await User.find({}, '-password').populate('myCourses');
     res.status(200).json({ status: 'success', data: { users } });
   } catch (error) {
     res.status(500).json({ status: 'error', message: error.message });

@@ -90,7 +90,7 @@ const signupUser = async (req, res) => {
 // Get all users (for admin purposes)
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().populate('myCourses');
     res.status(200).json({
       status: "success",
       count: users.length,
@@ -210,7 +210,7 @@ const updateProfile = async (req, res) => {
 // Enroll Course (Protected)
 const enrollCourse = async (req, res) => {
   try {
-    const { courseId } = req.body; 
+    const { courseId, paymentMethod, amount } = req.body; 
     const user = await User.findById(req.userId);
 
     if (!user) {
@@ -219,12 +219,52 @@ const enrollCourse = async (req, res) => {
 
     if (!user.myCourses.includes(courseId)) {
       user.myCourses.push(courseId);
+      
+      // Also push a payment record
+      user.payments.push({
+        courseId,
+        method: paymentMethod || 'card',
+        amount: amount || 0,
+        status: 'completed'
+      });
+      
       await user.save();
     }
 
     res.status(200).json({
       status: "success",
       message: "Enrolled successfully",
+      data: { user },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+// Unenroll Course (Protected)
+const unenrollCourse = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({ status: "fail", message: "User not found" });
+    }
+
+    // Filter out the course ID (handling ObjectIds gracefully)
+    user.myCourses = user.myCourses.filter((id) => id.toString() !== courseId);
+    
+    // Also remove the payment record
+    user.payments = user.payments.filter((payment) => payment.courseId.toString() !== courseId);
+    
+    await user.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Unenrolled successfully",
       data: { user },
     });
   } catch (error) {
@@ -243,5 +283,6 @@ module.exports = {
   deleteUser,
   updateProfile,
   enrollCourse,
+  unenrollCourse,
   getUserProfile
 };

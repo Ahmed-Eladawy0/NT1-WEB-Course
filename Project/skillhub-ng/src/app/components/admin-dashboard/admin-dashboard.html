@@ -120,6 +120,51 @@
             }
           </div>
 
+
+          <!-- ===== OPTIONAL RICH FIELDS ===== -->
+          <div class="field full" style="margin-top:6px;">
+            <label for="desc">Description <span style="font-weight:400;color:var(--ink-soft);">(optional)</span></label>
+            <textarea class="input" id="desc" formControlName="description" rows="3"
+                      placeholder="A short paragraph describing the course content and outcomes..."></textarea>
+          </div>
+
+          <div class="field full">
+            <label>What You'll Learn <span style="font-weight:400;color:var(--ink-soft);">(optional — press Enter to add)</span></label>
+            <div class="tag-input-wrap">
+              @for (item of whatYouWillLearnItems; track item + $index) {
+                <span class="tag-chip">{{ item }}<button type="button" (click)="removeTagItem($index, 'learn')" title="Remove">×</button></span>
+              }
+              <input #learnInput class="tag-bare-input" type="text" placeholder="e.g. Build responsive websites…" (keydown.enter)="addTagItem(learnInput, 'learn')">
+            </div>
+          </div>
+
+          <div class="field full">
+            <label>Requirements <span style="font-weight:400;color:var(--ink-soft);">(optional — press Enter to add)</span></label>
+            <div class="tag-input-wrap">
+              @for (item of requirementsItems; track item + $index) {
+                <span class="tag-chip">{{ item }}<button type="button" (click)="removeTagItem($index, 'req')" title="Remove">×</button></span>
+              }
+              <input #reqInput class="tag-bare-input" type="text" placeholder="e.g. Basic HTML knowledge…" (keydown.enter)="addTagItem(reqInput, 'req')">
+            </div>
+          </div>
+
+          <div class="field full">
+            <label>Tools &amp; Technologies <span style="font-weight:400;color:var(--ink-soft);">(optional — press Enter to add)</span></label>
+            <div class="tag-input-wrap">
+              @for (item of toolsItems; track item + $index) {
+                <span class="tag-chip">{{ item }}<button type="button" (click)="removeTagItem($index, 'tools')" title="Remove">×</button></span>
+              }
+              <input #toolsInput class="tag-bare-input" type="text" placeholder="e.g. VS Code, Git…" (keydown.enter)="addTagItem(toolsInput, 'tools')">
+            </div>
+          </div>
+
+          <div class="field full">
+            <label for="videoUrl">Preview Video URL <span style="font-weight:400;color:var(--ink-soft);">(optional)</span></label>
+            <input class="input" type="url" id="videoUrl" formControlName="videoUrl"
+                   placeholder="https://youtube.com/watch?v=… or a bare YouTube video ID">
+            <div class="field-hint">Shown as an embedded preview in the course detail panel.</div>
+          </div>
+
           <div class="form-actions">
             @if (isEditing) {
               <button type="button" class="btn btn-ghost" (click)="resetCourseForm()">Cancel</button>
@@ -128,6 +173,7 @@
               <span class="spinner"></span><span class="btn-label">{{ isEditing ? 'Update course' : 'Save course' }}</span>
             </button>
           </div>
+
         </form>
       </div>
 

@@ -7,8 +7,26 @@ export interface Course {
   price: number;
   duration: string;
   imageUrl?: string;
+  /** Short marketing description shown in the detail panel */
+  description?: string;
+  /** Bullet-list outcomes shown in the detail panel */
+  whatYouWillLearn?: string[];
+  /** Prerequisites / requirements */
+  requirements?: string[];
+  /** Tools / software used in the course */
+  tools?: string[];
+  /** YouTube video ID or full URL for the preview clip */
+  videoUrl?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface PaymentRecord {
+  courseId: string | Course;
+  method: string;
+  amount: number;
+  date: string;
+  status: string;
 }
 
 export interface User {
@@ -20,6 +38,7 @@ export interface User {
   phone?: string;
   imageUrl?: string;
   myCourses?: (string | Course)[];
+  payments?: PaymentRecord[];
   createdAt?: string;
   updatedAt?: string;
 }

@@ -1,0 +1,171 @@
+@if (courseData()) {
+  <div class="detail-overlay" (click)="onOverlayClick($event)" role="dialog" aria-modal="true" [attr.aria-label]="courseData()!.title">
+
+    <div class="detail-panel">
+
+      <!-- ===== HERO COVER ===== -->
+      <div class="detail-body">
+        <div class="detail-cover"
+             [style.background-image]="coverImgUrl() ? 'url(' + coverImgUrl() + ')' : null"
+             [style.background]="!coverImgUrl() ? coverColors().bg : null"
+             [style.color]="!coverImgUrl() ? coverColors().fg : null"
+             [innerHTML]="!coverImgUrl() ? coverIconSvgHtml() : null">
+
+          <div class="detail-cover-overlay"></div>
+          <span class="detail-cover-title">{{ courseData()!.title }}</span>
+
+          <button class="detail-close" (click)="close.emit()" aria-label="Close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <div class="detail-content">
+
+          <!-- Meta row -->
+          <div class="detail-meta">
+            <span class="pill"
+                  [style.background]="coverColors().bg"
+                  [style.color]="coverColors().fg">
+              {{ capitalize(courseData()!.category) }}
+            </span>
+            <span class="level-dots">
+              @for (on of levelDotsList(); track $index) {
+                <span [class.on]="on"></span>
+              }
+            </span>
+            <span class="level-label">{{ capitalize(courseData()!.level) }}</span>
+            <span class="muted" style="font-size:13px;">·</span>
+            <span class="muted" style="font-size:13px;">{{ courseData()!.duration }}</span>
+          </div>
+          <p class="detail-instructor">Instructor: <strong>{{ courseData()!.instructor }}</strong></p>
+
+          <hr class="detail-divider">
+
+          <!-- Description -->
+          <div>
+            <div class="detail-section-label">About this course</div>
+            <p class="detail-description">{{ description() }}</p>
+          </div>
+
+          <!-- Video preview -->
+          <div>
+            <div class="detail-section-label">Course preview</div>
+            @if (videoEmbedUrl()) {
+              <div class="detail-video-wrap">
+                <iframe [src]="videoEmbedUrl()!"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                        loading="lazy"
+                        title="Course preview video">
+                </iframe>
+              </div>
+            } @else {
+              <div class="detail-video-placeholder">
+                <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="12" cy="12" r="9"/>
+                  <polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/>
+                </svg>
+                <span>Preview coming soon</span>
+              </div>
+            }
+          </div>
+
+          <hr class="detail-divider">
+
+          <!-- What you'll learn -->
+          <div>
+            <div class="detail-section-label">What you'll learn</div>
+            <ul class="detail-bullet-list">
+              @for (item of whatYouWillLearn(); track item) {
+                <li>
+                  <svg class="bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M20 6L9 17l-5-5"/>
+                  </svg>
+                  {{ item }}
+                </li>
+              }
+            </ul>
+          </div>
+
+          <hr class="detail-divider">
+
+          <!-- Requirements -->
+          <div>
+            <div class="detail-section-label">Requirements</div>
+            <ul class="detail-bullet-list">
+              @for (item of requirements(); track item) {
+                <li>
+                  <svg class="bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/>
+                  </svg>
+                  {{ item }}
+                </li>
+              }
+            </ul>
+          </div>
+
+          <hr class="detail-divider">
+
+          <!-- Tools -->
+          <div>
+            <div class="detail-section-label">Tools &amp; technologies</div>
+            <div class="detail-tags">
+              @for (tool of tools(); track tool) {
+                <span class="detail-tag">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                  {{ tool }}
+                </span>
+              }
+            </div>
+          </div>
+
+          <!-- spacer so footer doesn't overlap last item -->
+          <div style="height:8px;"></div>
+        </div>
+      </div>
+
+      <!-- ===== STICKY FOOTER ===== -->
+      <div class="detail-footer">
+        <div class="detail-price-block">
+          <span class="detail-price-label">Course price</span>
+          <span class="detail-price">EGP {{ courseData()!.price }}</span>
+        </div>
+
+        @if (isEnrolled()) {
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <span class="detail-enrolled-chip">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+              Enrolled
+            </span>
+            <button class="btn btn-ghost btn-sm"
+                    style="color:var(--red); border-color:var(--red); font-size:12.5px;"
+                    [class.is-loading]="isUnenrolling()"
+                    [disabled]="isUnenrolling()"
+                    (click)="onUnenroll()">
+              <span class="spinner" style="border-color:var(--red-soft); border-top-color:var(--red);"></span>
+              <span class="btn-label">Unenroll</span>
+            </button>
+          </div>
+
+        } @else {
+          <button class="btn btn-primary detail-enroll-btn"
+                  [class.is-loading]="isEnrolling()"
+                  [disabled]="isEnrolling()"
+                  (click)="onEnroll()">
+            <span class="spinner"></span>
+            <span class="btn-label">Enroll Now</span>
+          </button>
+        }
+      </div>
+
+    </div><!-- /detail-panel -->
+  </div><!-- /detail-overlay -->
+}

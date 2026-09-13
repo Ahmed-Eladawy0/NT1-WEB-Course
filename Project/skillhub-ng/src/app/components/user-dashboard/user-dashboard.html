@@ -46,7 +46,7 @@
     } @else {
       <div class="courses-grid">
         @for (course of filteredCourses(); track course._id) {
-          <div class="card course-card fade-up">
+          <div class="card course-card fade-up" style="cursor:pointer" (click)="openDetail(course)">
             @if (coverImage(course); as img) {
               <div class="course-cover" [style.background-image]="'url(' + img + ')'"></div>
             } @else {
@@ -75,7 +75,10 @@
                   Enrolled
                 </span>
               } @else {
-                <button class="btn btn-outline-ink btn-sm" [class.is-loading]="isEnrolling(course)" [disabled]="isEnrolling(course)" (click)="enroll(course)">
+                <button class="btn btn-outline-ink btn-sm"
+                        [class.is-loading]="isEnrolling(course)"
+                        [disabled]="isEnrolling(course)"
+                        (click)="openPayment(course); $event.stopPropagation()">
                   <span class="spinner"></span><span class="btn-label">Enroll now</span>
                 </button>
               }
@@ -85,4 +88,22 @@
       </div>
     }
   </div>
+
+  <!-- ===== Course Detail Slide-in Panel ===== -->
+  <app-course-detail
+    [course]="selectedCourse()"
+    [enrolledIds]="enrolledIds"
+    [enrollingIds]="enrollingIds"
+    [unenrollingIds]="unenrollingIds"
+    (close)="closeDetail()"
+    (enroll)="openPayment($event)"
+    (unenroll)="unenroll($event)">
+  </app-course-detail>
+
+  <!-- ===== Payment Modal ===== -->
+  <app-payment-modal
+    [course]="pendingEnrollCourse()"
+    (confirmed)="executeEnroll($event)"
+    (cancelled)="pendingEnrollCourse.set(null)">
+  </app-payment-modal>
 </div>
