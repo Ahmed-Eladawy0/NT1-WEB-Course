@@ -60,37 +60,45 @@ A robust, full-stack Course Management System built with the **MEAN Stack** (Mon
 
 ## 1. Backend Setup
 
-````bash
+``bash
+
 # Navigate to the backend directory
+
 cd Backend
 
 # Install dependencies
+
 npm install
 
 # Set up environment variables
+
 # Create a .env file and add your PORT, MONGO_URI, and JWT_SECRET
 
 # Start the development server
-npm run dev
----
 
+## npm run dev
 
 ## 2. Frontend Setup
 
-```bash
+``bash
+
 # Navigate to the frontend directory
+
 cd skillhub-ng
 
 # Install dependencies
+
 npm install
 
 # Start the Angular development server
+
 ng serve
 The application will be available at http://localhost:4200/.
 
 ---
 
-📁 Project Architecture Highlights
+## 📁 Project Architecture Highlights
+
 Smart Redirects: The AuthService intelligently parses the JWT payload upon login/signup and uses the Angular Router to redirect users to their specific dashboards based on their role.
 
 Separation of Concerns: Clean backend structure separating Routes, Controllers, Models, and Middlewares.
@@ -98,6 +106,8 @@ Separation of Concerns: Clean backend structure separating Routes, Controllers, 
 Frontend Caching: Utilizing Angular Signals to cache courses and user data locally, minimizing redundant API calls.
 
 Developed by Ahmed Eladawy as a comprehensive showcase of full-stack engineering and cybersecurity principles.
-````
+
+```
 
 ---
+```
