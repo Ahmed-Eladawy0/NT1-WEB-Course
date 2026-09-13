@@ -45,7 +45,6 @@
       </div>
     } @else {
       <div class="courses-grid">
-        <!-- استخدام filteredCourses() كـ Signal -->
         @for (course of filteredCourses(); track course._id) {
           <div class="card course-card fade-up">
             @if (coverImage(course); as img) {
