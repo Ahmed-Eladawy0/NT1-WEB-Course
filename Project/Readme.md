@@ -60,7 +60,7 @@ A robust, full-stack Course Management System built with the **MEAN Stack** (Mon
 
 1. Backend Setup
 
-```bash
+````bash
 # Navigate to the backend directory
 cd Backend
 
@@ -76,7 +76,8 @@ npm run dev
 ---
 
 2. Frontend Setup
-Bash
+
+```bash
 # Navigate to the frontend directory
 cd skillhub-ng
 
@@ -97,4 +98,4 @@ Separation of Concerns: Clean backend structure separating Routes, Controllers, 
 Frontend Caching: Utilizing Angular Signals to cache courses and user data locally, minimizing redundant API calls.
 
 Developed by Ahmed Eladawy as a comprehensive showcase of full-stack engineering and cybersecurity principles.
-```
+````
