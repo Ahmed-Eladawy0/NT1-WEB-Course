@@ -58,7 +58,7 @@ A robust, full-stack Course Management System built with the **MEAN Stack** (Mon
 
 ---
 
-1. Backend Setup
+## 1. Backend Setup
 
 ````bash
 # Navigate to the backend directory
@@ -72,10 +72,10 @@ npm install
 
 # Start the development server
 npm run dev
-
 ---
 
-2. Frontend Setup
+
+## 2. Frontend Setup
 
 ```bash
 # Navigate to the frontend directory
@@ -99,3 +99,5 @@ Frontend Caching: Utilizing Angular Signals to cache courses and user data local
 
 Developed by Ahmed Eladawy as a comprehensive showcase of full-stack engineering and cybersecurity principles.
 ````
+
+---
