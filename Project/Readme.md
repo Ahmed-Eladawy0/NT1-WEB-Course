@@ -96,5 +96,5 @@ Separation of Concerns: Clean backend structure separating Routes, Controllers, 
 
 Frontend Caching: Utilizing Angular Signals to cache courses and user data locally, minimizing redundant API calls.
 
-Developed by Adawy as a comprehensive showcase of full-stack engineering and cybersecurity principles.
+Developed by Ahmed Eladawy as a comprehensive showcase of full-stack engineering and cybersecurity principles.
 ```

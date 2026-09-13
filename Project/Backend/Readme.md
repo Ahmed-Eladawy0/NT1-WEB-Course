@@ -63,3 +63,5 @@ To start the server in development mode (using nodemon):
 Bash
 npm run dev
 ```
+
+Developed by Ahmed Eladawy as a comprehensive showcase of full-stack engineering and cybersecurity principles.
