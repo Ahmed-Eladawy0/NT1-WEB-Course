@@ -1,30 +1,27 @@
 # 💻 SkillHub Frontend (Angular Client)
 
-The modern, responsive client-side application for the **SkillHub** Course Management System. Built with Angular 17+, this application leverages modern reactive features like Standalone Components, Signals, and functional route guards to deliver a seamless user experience.
+The modern, responsive client-side application for the **SkillHub** Course Management System. Built with Angular, this application leverages modern reactive features like Standalone Components, Signals, and the three core Angular form techniques (Template-driven, Reactive, and Signal Forms) to deliver a seamless user experience.
 
 ---
 
 ## 🛠️ Tech Stack & Dependencies
 
-- **Framework:** Angular 17+
-- **Architecture:** Standalone Components & functional `inject()` Dependency Injection
+- **Framework:** Angular
+- **Architecture:** Standalone Components with functional `inject()` Dependency Injection
 - **State Management:** Angular Signals for reactive UI updates
-- **Routing:** Angular Router with functional `CanActivateFn` Guards returning `UrlTree`
-- **HTTP Client:** `@angular/common/http` with HTTP Interceptors
-- **Security:** `jwt-decode` for client-side token expiration validation
+- **Forms:** Template-driven Forms (Login), Signal Forms (Signup/Profile), Reactive Forms (Course management)
+- **Routing:** Angular Router
+- **HTTP Client:** `@angular/common/http`
 
 ---
 
 ## ✨ Key Features
 
-- **Role-Based Dashboards:** Separate experiences and interfaces for students and administrators.
-- **Client-Side Route Protection:**
-  - `authGuard`: Restricts protected pages (Dashboard, Profile) to authenticated users.
-  - `adminGuard`: Restricts management tools to users with the `admin` role.
-  - `guestGuard`: Redirects already authenticated users away from Login and Signup pages.
-- **Reactive State:** Efficient local state management via Signals (`coursesCache`, `usersCache`) to minimize redundant network round trips.
-- **Intelligent Navigation:** Automatic role-based routing upon successful authentication.
-- **HTTP Interceptor:** Seamless JWT attachment to outgoing API requests and global error intercepting.
+- **Role-Based Dashboards** — Separate experiences and interfaces for students and administrators.
+- **Session-Aware Navigation** — Logged-in users are redirected to the right dashboard automatically, and protected pages redirect back to login when there's no active session.
+- **Reactive State** — Efficient local state management via Signals (`coursesCache`, `usersCache`, etc.) to minimize redundant network round trips.
+- **Real File Uploads** — Profile avatars and course cover images are uploaded directly to the backend via `multipart/form-data`.
+- **Intelligent Navigation** — Automatic role-based routing upon successful authentication.
 
 ---
 
@@ -34,45 +31,64 @@ The modern, responsive client-side application for the **SkillHub** Course Manag
 skillhub-ng/
 ├── src/
 │   ├── app/
-│   │   ├── components/      # UI Views (Login, Dashboards, Profile)
-│   │   ├── core/
-│   │   │   ├── guards/      # auth.guard, admin.guard, guest.guard
-│   │   │   ├── interceptors/# Authentication and error interceptors
-│   │   │   ├── models/      # TypeScript interfaces and types
-│   │   │   └── services/    # Centralized API logic (AuthService, etc.)
-│   │   ├── app.config.ts    # Application configuration & providers
-│   │   └── app.routes.ts    # Route definitions and guard mappings
-│   └── styles.css           # Global design system & utility classes
-├── angular.json             # Workspace configuration
-└── package.json             # Dependencies and build scripts
+│   │   ├── signin-form/       # Login page (Template-driven form)
+│   │   ├── signup-form/       # Signup page (Signal Forms)
+│   │   ├── profile-form/      # Profile page (Signal Forms)
+│   │   ├── add-course-form/   # Course create/edit (Reactive Forms)
+│   │   ├── user-dashboard/    # Student course catalog & enrollment
+│   │   ├── admin-dashboard/   # Course & user management
+│   │   ├── header/            # Shared top navigation
+│   │   ├── services/          # Centralized API logic (AuthService, CourseService)
+│   │   ├── constants/         # Shared constants (course categories/levels)
+│   │   ├── models.ts          # TypeScript interfaces and types
+│   │   ├── utils.ts           # Shared formatting/display helpers
+│   │   ├── app.config.ts      # Application configuration & providers
+│   │   └── app.routes.ts      # Route definitions
+│   └── styles.css             # Global design system & utility classes
+├── angular.json                # Workspace configuration
+└── package.json                 # Dependencies and build scripts
+```
 
-🚀 Getting Started
-Prerequisites
-Node.js installed
+---
 
-Angular CLI installed globally:
+## 🚀 Getting Started
 
-Bash
+### Prerequisites
+
+- Node.js installed
+- Angular CLI installed globally:
+
+```bash
 npm install -g @angular/cli
-1. Installation
+```
+
+### 1. Installation
+
 Navigate to the frontend directory and install dependencies:
 
-Bash
+```bash
 cd skillhub-ng
 npm install
-2. Development Server
+```
+
+### 2. Development Server
+
 Run the local dev server:
 
-Bash
+```bash
 ng serve
-Navigate to http://localhost:4200/ in your browser.
+```
 
-3. Production Build
+Navigate to `http://localhost:4200/` in your browser.
+
+### 3. Production Build
+
 To create a production-ready optimized build:
 
-Bash
+```bash
 ng build
-
-
-Frontend Architecture & UI Implementation by Ahmed Eladawy.
 ```
+
+---
+
+Frontend Architecture & UI Implementation by **Ahmed Eladawy**.

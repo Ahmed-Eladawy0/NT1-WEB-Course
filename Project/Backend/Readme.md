@@ -17,11 +17,11 @@ The robust and secure RESTful API powering the **SkillHub** Course Management Sy
 
 ## ✨ Key Features
 
-- **JWT-Based Authentication:** Secure, stateless user sessions with expiration handling.
-- **Role-Based Access Control (RBAC):** Custom middleware to protect endpoints based on user roles (`Admin` vs `Student`).
-- **Secure Password Storage:** Passwords are never stored in plaintext; they are hashed using bcrypt before hitting the database.
-- **Media Management:** Configured Multer storage engine to securely accept, rename, and store uploaded images in the `/uploads` directory.
-- **RESTful Architecture:** Clean and predictable API endpoints for Users and Courses.
+- **JWT-Based Authentication** — Secure, stateless user sessions with expiration handling.
+- **Role-Based Access Control (RBAC)** — Custom middleware to protect endpoints based on user roles (`admin` vs `student`).
+- **Secure Password Storage** — Passwords are never stored in plaintext; they are hashed using bcrypt before hitting the database.
+- **Media Management** — A configured Multer storage engine securely accepts, renames, and stores uploaded images in the `/uploads` directory.
+- **RESTful Architecture** — Clean and predictable API endpoints for Users and Courses.
 
 ---
 
@@ -29,39 +29,52 @@ The robust and secure RESTful API powering the **SkillHub** Course Management Sy
 
 ```text
 Backend/
-├── config/             # Database connection setup (db-connect.js)
-├── controllers/        # Business logic for Auth, Users, and Courses
-├── middlewares/        # Custom middlewares (auth, roles, multer)
-├── models/             # Mongoose schemas (User, Course)
-├── routes/             # Express routers
-├── uploads/            # Static folder for uploaded images (courses/ users/)
-├── index.js            # Application entry point
-└── package.json        # Project metadata and scripts
+├── config/          # Database connection setup (db-connect.js)
+├── controllers/     # Business logic for Auth, Users, and Courses
+├── middlewares/     # Custom middlewares (auth, roles, multer)
+├── models/          # Mongoose schemas (User, Course)
+├── routes/          # Express routers
+├── uploads/         # Static folder for uploaded images (courses/, users/)
+├── index.js         # Application entry point
+└── package.json     # Project metadata and scripts
+```
 
-🚀 Getting Started
-Prerequisites
-Node.js installed
+---
 
-MongoDB running locally or a MongoDB Atlas URI
+## 🚀 Getting Started
 
-1. Installation
+### Prerequisites
+
+- Node.js installed
+- MongoDB running locally or a MongoDB Atlas URI
+
+### 1. Installation
+
 Clone the repository and install the dependencies:
 
-Bash
+```bash
 cd Backend
 npm install
-2. Environment Variables
-Create a .env file in the root directory and add the following keys:
+```
 
-Code snippet
+### 2. Environment Variables
+
+Create a `.env` file in the root directory and add the following keys:
+
+```env
 PORT=5000
 MONGO_URI=your_mongodb_connection_string_here
 JWT_SECRET=your_super_secret_jwt_key
-3. Run the Server
+```
+
+### 3. Run the Server
+
 To start the server in development mode (using nodemon):
 
-Bash
+```bash
 npm run dev
 ```
 
-Developed by Ahmed Eladawy as a comprehensive showcase of full-stack engineering and cybersecurity principles.
+---
+
+Developed by **Ahmed Eladawy** as a comprehensive showcase of full-stack engineering and cybersecurity principles.
