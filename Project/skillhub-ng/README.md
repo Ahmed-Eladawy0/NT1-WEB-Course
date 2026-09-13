@@ -1,59 +1,78 @@
-# SkillhubNg
+# 💻 SkillHub Frontend (Angular Client)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.21.
+The modern, responsive client-side application for the **SkillHub** Course Management System. Built with Angular 17+, this application leverages modern reactive features like Standalone Components, Signals, and functional route guards to deliver a seamless user experience.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🛠️ Tech Stack & Dependencies
 
-```bash
+- **Framework:** Angular 17+
+- **Architecture:** Standalone Components & functional `inject()` Dependency Injection
+- **State Management:** Angular Signals for reactive UI updates
+- **Routing:** Angular Router with functional `CanActivateFn` Guards returning `UrlTree`
+- **HTTP Client:** `@angular/common/http` with HTTP Interceptors
+- **Security:** `jwt-decode` for client-side token expiration validation
+
+---
+
+## ✨ Key Features
+
+- **Role-Based Dashboards:** Separate experiences and interfaces for students and administrators.
+- **Client-Side Route Protection:**
+  - `authGuard`: Restricts protected pages (Dashboard, Profile) to authenticated users.
+  - `adminGuard`: Restricts management tools to users with the `admin` role.
+  - `guestGuard`: Redirects already authenticated users away from Login and Signup pages.
+- **Reactive State:** Efficient local state management via Signals (`coursesCache`, `usersCache`) to minimize redundant network round trips.
+- **Intelligent Navigation:** Automatic role-based routing upon successful authentication.
+- **HTTP Interceptor:** Seamless JWT attachment to outgoing API requests and global error intercepting.
+
+---
+
+## 📂 Project Structure
+
+```text
+skillhub-ng/
+├── src/
+│   ├── app/
+│   │   ├── components/      # UI Views (Login, Dashboards, Profile)
+│   │   ├── core/
+│   │   │   ├── guards/      # auth.guard, admin.guard, guest.guard
+│   │   │   ├── interceptors/# Authentication and error interceptors
+│   │   │   ├── models/      # TypeScript interfaces and types
+│   │   │   └── services/    # Centralized API logic (AuthService, etc.)
+│   │   ├── app.config.ts    # Application configuration & providers
+│   │   └── app.routes.ts    # Route definitions and guard mappings
+│   └── styles.css           # Global design system & utility classes
+├── angular.json             # Workspace configuration
+└── package.json             # Dependencies and build scripts
+
+🚀 Getting Started
+Prerequisites
+Node.js installed
+
+Angular CLI installed globally:
+
+Bash
+npm install -g @angular/cli
+1. Installation
+Navigate to the frontend directory and install dependencies:
+
+Bash
+cd skillhub-ng
+npm install
+2. Development Server
+Run the local dev server:
+
+Bash
 ng serve
-```
+Navigate to http://localhost:4200/ in your browser.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+3. Production Build
+To create a production-ready optimized build:
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
+Bash
 ng build
+
+
+Frontend Architecture & UI Implementation by Ahmed Eladawy.
 ```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
