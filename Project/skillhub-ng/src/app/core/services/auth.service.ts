@@ -78,6 +78,12 @@ export class AuthService {
       tap(data => {
         if (data.status === 'success' && data.data) {
           this.setSession(data.token ?? null, data.data.user);
+          
+          if (data.data.user.role === 'admin') {
+            this.router.navigate(['/admin']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
         }
       })
     );
@@ -88,6 +94,8 @@ export class AuthService {
       tap(data => {
         if (data.status === 'success' && data.data) {
           this.setSession(data.token ?? null, data.data.user);
+          
+          this.router.navigate(['/dashboard']);
         }
       })
     );

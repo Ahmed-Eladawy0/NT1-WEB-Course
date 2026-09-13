@@ -5,13 +5,14 @@ import { AuthService } from '../services/auth.service';
 export const adminGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
+
   if (!auth.isLoggedIn()) {
-    router.navigateByUrl('/login');
-    return false;
+    return router.createUrlTree(['/login']);
   }
+
   if (!auth.isAdmin()) {
-    router.navigateByUrl('/dashboard');
-    return false;
+    return router.createUrlTree(['/dashboard']);
   }
+
   return true;
 };
