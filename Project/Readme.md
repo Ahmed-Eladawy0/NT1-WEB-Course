@@ -62,37 +62,38 @@ A robust, full-stack Course Management System built with the **MEAN Stack** (Mon
 
 ``bash
 
-# Navigate to the backend directory
+1. Navigate to the backend directory
 
 cd Backend
 
-# Install dependencies
+2. Install dependencies
 
 npm install
 
-# Set up environment variables
+3. Set up environment variables
 
-# Create a .env file and add your PORT, MONGO_URI, and JWT_SECRET
+4. Create a .env file and add your PORT, MONGO_URI, and JWT_SECRET
 
-# Start the development server
+5. Start the development server
 
-## npm run dev
+npm run dev
 
 ## 2. Frontend Setup
 
 ``bash
 
-# Navigate to the frontend directory
+1. Navigate to the frontend directory
 
 cd skillhub-ng
 
-# Install dependencies
+2. Install dependencies
 
 npm install
 
-# Start the Angular development server
+3. Start the Angular development server
 
 ng serve
+
 The application will be available at http://localhost:4200/.
 
 ---
@@ -108,6 +109,5 @@ Frontend Caching: Utilizing Angular Signals to cache courses and user data local
 Developed by Ahmed Eladawy as a comprehensive showcase of full-stack engineering and cybersecurity principles.
 
 ```
-
 ---
 ```
