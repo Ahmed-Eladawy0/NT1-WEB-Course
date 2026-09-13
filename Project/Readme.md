@@ -1,12 +1,14 @@
 # 🎓 SkillHub - Course Management System
 
-A robust, full-stack Course Management System built with the **MEAN Stack** (MongoDB, Express.js, Angular 17+, Node.js). Designed with a strong emphasis on security, Role-Based Access Control (RBAC), and modern state management.
+A robust, full-stack Course Management System built with the **MEAN Stack** (**MongoDB, Express.js, Angular 17+, Node.js**).
+
+Designed with a strong emphasis on security, Role-Based Access Control (RBAC), and modern state management.
 
 ---
 
 ## ✨ Key Features
 
-**🔒 Security & Authentication**
+### 🔒 Security & Authentication
 
 - **JWT Authentication:** Secure login and registration with stateless JWT tokens.
 - **Role-Based Access Control (RBAC):** Distinct privileges for `Admin` and `Student` roles.
@@ -14,13 +16,13 @@ A robust, full-stack Course Management System built with the **MEAN Stack** (Mon
 - **HTTP Interceptors:** Automatic token injection and centralized unauthorized error handling.
 - **Password Hashing:** Passwords securely hashed using `bcrypt` before database storage.
 
-**👨‍💻 Admin Features**
+### 👨‍💻 Admin Features
 
-- **User Management:** View all registered users, toggle roles (Admin/Student), and delete users.
+- **User Management:** View all registered users, toggle roles (`Admin` / `Student`), and delete users.
 - **Course Management:** Full CRUD operations for courses.
 - **File Uploads:** Upload and manage course thumbnails securely using `Multer`.
 
-**🎓 Student Features**
+### 🎓 Student Features
 
 - **Course Browsing:** View available courses with dynamic routing and parameters.
 - **Enrollment System:** One-click enrollment in courses.
@@ -31,7 +33,7 @@ A robust, full-stack Course Management System built with the **MEAN Stack** (Mon
 
 ## 🛠️ Technology Stack
 
-**Frontend (Client)**
+### Frontend (Client)
 
 - **Framework:** Angular 17+
 - **Architecture:** Standalone Components, `inject()` Dependency Injection.
@@ -39,7 +41,7 @@ A robust, full-stack Course Management System built with the **MEAN Stack** (Mon
 - **Routing:** Lazy loading, Child Routes, and dynamic parameter parsing.
 - **Libraries:** `jwt-decode` for client-side token expiration validation.
 
-**Backend (Server)**
+### Backend (Server)
 
 - **Environment:** Node.js
 - **Framework:** Express.js
@@ -52,62 +54,114 @@ A robust, full-stack Course Management System built with the **MEAN Stack** (Mon
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) installed on your machine.
-- [Angular CLI](https://angular.io/cli) installed globally (`npm install -g @angular/cli`).
-- [MongoDB](https://www.mongodb.com/) running locally or via MongoDB Atlas.
+Make sure the following are installed:
+
+- [Node.js](https://nodejs.org/)
+- [Angular CLI](https://angular.dev/tools/cli)
+
+```bash
+npm install -g @angular/cli
+```
+
+- [MongoDB](https://www.mongodb.com/), running locally or through MongoDB Atlas.
 
 ---
 
 ## 1. Backend Setup
 
-``bash
+### Step 1 — Navigate to the Backend directory
 
-1. Navigate to the backend directory
-
+```bash
 cd Backend
+```
 
-2. Install dependencies
+### Step 2 — Install dependencies
 
+```bash
 npm install
+```
 
-3. Set up environment variables
+### Step 3 — Set up environment variables
 
-4. Create a .env file and add your PORT, MONGO_URI, and JWT_SECRET
+Create a `.env` file inside the `Backend` directory:
 
-5. Start the development server
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+```
 
+> **Important:** Do not commit your real `.env` file or secrets to GitHub.
+
+### Step 4 — Start the development server
+
+```bash
 npm run dev
+```
+
+---
 
 ## 2. Frontend Setup
 
-``bash
+### Step 1 — Navigate to the Frontend directory
 
-1. Navigate to the frontend directory
-
+```bash
 cd skillhub-ng
+```
 
-2. Install dependencies
+### Step 2 — Install dependencies
 
+```bash
 npm install
+```
 
-3. Start the Angular development server
+### Step 3 — Start the Angular development server
 
+```bash
 ng serve
+```
 
-The application will be available at http://localhost:4200/.
+The application will be available at:
+
+**http://localhost:4200/**
 
 ---
 
 ## 📁 Project Architecture Highlights
 
-Smart Redirects: The AuthService intelligently parses the JWT payload upon login/signup and uses the Angular Router to redirect users to their specific dashboards based on their role.
+### Smart Redirects
 
-Separation of Concerns: Clean backend structure separating Routes, Controllers, Models, and Middlewares.
+The `AuthService` intelligently parses the JWT payload after login/signup and uses the Angular Router to redirect users to the appropriate dashboard based on their role.
 
-Frontend Caching: Utilizing Angular Signals to cache courses and user data locally, minimizing redundant API calls.
+### Separation of Concerns
 
-Developed by Ahmed Eladawy as a comprehensive showcase of full-stack engineering and cybersecurity principles.
+The backend follows a clean structure separating:
 
-```
+- Routes
+- Controllers
+- Models
+- Middlewares
+
+### Frontend State Management
+
+Angular Signals are used for reactive UI updates and local application state.
+
 ---
-```
+
+## 🔗 Useful Resources
+
+- [Angular Documentation](https://angular.dev/)
+- [Angular CLI Documentation](https://angular.dev/tools/cli)
+- [Node.js Documentation](https://nodejs.org/docs/latest/api/)
+- [Express.js Documentation](https://expressjs.com/)
+- [MongoDB Documentation](https://www.mongodb.com/docs/)
+- [Mongoose Documentation](https://mongoosejs.com/docs/)
+- [Git Documentation](https://git-scm.com/doc)
+
+---
+
+## 👨‍💻 Developed By
+
+**Ahmed Eladawy**
+
+A full-stack Course Management System showcasing web development, authentication, role-based access control, and cybersecurity principles.
